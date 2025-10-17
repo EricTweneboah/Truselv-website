@@ -279,8 +279,17 @@
   <div class="modal fade" id="applyModal" tabindex="-1" role="dialog" aria-labelledby="applyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
       <div class="modal-content">
-          <form id="applyForm" name="careers" method="POST" data-netlify="true" action="/success.html" enctype="multipart/form-data">
+
+          <form id="applyForm" name="careers" method="POST" data-netlify="true" action="/success.html" data-netlify-honeypot="bot-field" enctype="multipart/form-data">
             <input type="hidden" name="form-name" value="careers">
+
+             <!-- Honeypot field (hidden from humans) -->
+        <p class="d-none">
+          <label>Don’t fill this out if you're human: 
+            <input name="bot-field">
+          </label>
+        </p>
+        
           <!-- NOTE: Replace action with your backend endpoint or form processing service -->
           <div class="modal-header">
             <h5 class="modal-title" id="applyModalLabel">Apply for role</h5>
