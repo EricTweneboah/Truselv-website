@@ -279,7 +279,9 @@
   <div class="modal fade" id="applyModal" tabindex="-1" role="dialog" aria-labelledby="applyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
       <div class="modal-content">
-        <form id="applyForm" action="/apply" method="post" enctype="multipart/form-data">
+        <!-- <form id="applyForm" action="/apply" method="post" enctype="multipart/form-data"> old form code. Might need later -->
+          <form id="applyForm" name="careers" method="POST" data-netlify="true" enctype="multipart/form-data">
+            <input type="hidden" name="form-name" value="careers">
           <!-- NOTE: Replace action with your backend endpoint or form processing service -->
           <div class="modal-header">
             <h5 class="modal-title" id="applyModalLabel">Apply for role</h5>
@@ -419,6 +421,8 @@
     });
 
     // Basic client-side submit handler that converts the form to mailto fallback if no backend is configured
+    /*
+    
     $('#applyForm').on('submit', function(e){
       var action = $(this).attr('action');
       // If action is still placeholder, use mailto fallback
@@ -430,7 +434,7 @@
         var message = $('#appCover').val() || '';
         var body = 'Name: ' + name + '%0D%0A' + 'Email: ' + email + '%0D%0A' + '%0D%0A' + encodeURIComponent(message);
         var mailto = 'mailto:support@truselv.co.uk?subject=' + encodeURIComponent('Application for ' + job) + '&body=' + body;
-        window.location.href = mailto;
+        window.location.href = mailto;                 /
       }
       // Otherwise the form will submit to the configured backend
     });
