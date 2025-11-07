@@ -8,10 +8,17 @@
 
      <meta charset="UTF-8">
      <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-     <meta name="description" content="">
-     <meta name="keywords" content="">
-     <meta name="author" content="">
+     <meta name="description" content="Get in touch with TruSelv to discuss intelligent healthcare software, partnerships, or product enquiries.">
+     <meta name="keywords" content="TruSelv, healthcare technology, contact, patient care, digital health">
+     <meta name="author" content="TruSelv">
      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+     <link rel="canonical" href="https://www.truselv.co.uk/contact.html">
+     <meta property="og:title" content="Contact TruSelv">
+     <meta property="og:description" content="Let’s talk about intelligent healthcare solutions that empower patients and clinical teams.">
+     <meta property="og:type" content="website">
+     <meta property="og:url" content="https://www.truselv.co.uk/contact.html">
+     <meta property="og:image" content="https://www.truselv.co.uk/images/doctor.png">
+     <meta name="twitter:card" content="summary_large_image">
 
      <link rel="stylesheet" href="css/bootstrap.min.css">
      <link rel="stylesheet" href="css/font-awesome.min.css">
@@ -75,18 +82,26 @@
                     
                     <!-- contact form -->
                     
-                      <form action="send_mail.php" method="post" class="contact-form" data-aos="fade-up" data-aos-delay="300" role="form">
+                      <form action="php/send_mail.php" method="post" class="contact-form" data-aos="fade-up" data-aos-delay="300" role="form">
                         <div class="row">
                           <div class="col-lg-6 col-12">
-                            <input type="text" class="form-control" name="name" placeholder="Name">
+                            <label class="visually-hidden" for="name">Full name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Full name" autocomplete="name" minlength="2" required>
                           </div>
 
                           <div class="col-lg-6 col-12">
-                            <input type="email" class="form-control" name="email" placeholder="Email">
+                            <label class="visually-hidden" for="email">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" autocomplete="email" required>
                           </div>
 
                           <div class="col-lg-12 col-12">
-                            <textarea class="form-control" rows="6" name="message" placeholder="Message"></textarea>
+                            <label class="visually-hidden" for="message">Your message</label>
+                            <textarea class="form-control" rows="6" id="message" name="message" placeholder="How can we help?" minlength="10" required></textarea>
+                          </div>
+
+                          <div class="visually-hidden">
+                            <label for="website">Leave this field empty</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                           </div>
 
                           <div class="col-lg-5 mx-auto col-7">
@@ -108,7 +123,7 @@
 	4. Copy only URL and paste it within the src="" field below
 -->
      <div class="google-map" data-aos="zoom-in">
-       <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2491.9511291807985!2d-2.9827873875956707!3d51.34880927165989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4871f9a8bf8febe9%3A0x45cae3f8b2cd9cad!2sWe%20Are%20Super!5e0!3m2!1sen!2suk!4v1759626494840!5m2!1sen!2suk" width="1920" height="600" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+       <iframe title="TruSelv office location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2491.9511291807985!2d-2.9827873875956707!3d51.34880927165989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4871f9a8bf8febe9%3A0x45cae3f8b2cd9cad!2sWe%20Are%20Super!5e0!3m2!1sen!2suk!4v1759626494840!5m2!1sen!2suk" allowfullscreen></iframe>
      </div>
 
 

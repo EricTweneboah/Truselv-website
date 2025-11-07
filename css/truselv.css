@@ -4,29 +4,32 @@
       font-family: 'Plain-Regular';
       src: url('../fonts/Plain-Regular.woff2') format('woff2'),
           url('../fonts/Plain-Regular.woff') format('woff');
-      font-weight: normal;
+      font-weight: 400;
       font-style: normal;
+      font-display: swap;
   }
 
   @font-face {
       font-family: 'Plain-Light';
       src: url('../fonts/Plain-Light.woff2') format('woff2'),
           url('../fonts/Plain-Light.woff') format('woff');
-      font-weight: bold;
+      font-weight: 300;
       font-style: normal;
+      font-display: swap;
   }
 
   @font-face {
       font-family: 'Plain-Bold';
       src: url('../fonts/Plain-Bold.woff2') format('woff2'),
           url('../fonts/Plain-Bold.woff') format('woff');
-      font-weight: bold;
+      font-weight: 700;
       font-style: normal;
+      font-display: swap;
   }
 
   :root {
     --primary-color:        #057a8d;
-    --secondary-color:      #f1c111;
+    --secondary-color:      #000000;
     --white-color:          #ffffff;
     --dark-color:           #171819;
     --project-bg:           #f0f8ff;
@@ -101,7 +104,8 @@
   b, 
   strong {
     letter-spacing: 0;
-    color: var(--secondary-color);
+    color: rgb(4, 4, 148);
+    font-weight: bolder;
   }
 
   .highlight {
@@ -207,9 +211,34 @@
     padding: 4em 0;
   }
 
+  .google-map {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--border-radius-small);
+  }
+
   .google-map iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: block;
     width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
 
@@ -487,7 +516,7 @@
 
 .about-grid-team{
  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  grid-template-columns: repeat(3, 1fr); /* 2 columns */
   gap: 30px; /* spacing between tiles */
   margin-bottom: 40px; /* spacing before image */
 
@@ -852,5 +881,4 @@
       margin-left: 0;
     }
   }
-
 
