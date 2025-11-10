@@ -882,6 +882,7 @@
     border-radius: 32px;
     overflow: hidden;
     box-shadow: var(--shadow-soft);
+    width: min(50vw, 900px);
   }
 
   .full-image img {
@@ -1420,9 +1421,14 @@
     margin-bottom:8px;
   }
 
+  .job-card p,
+  .job-card small,
+  .job-meta {
+    color: var(--p-color);
+  }
+
   .job-meta {
     font-size:0.95rem;
-    color:var(--gray-color);
     text-align: right;
   }
 
@@ -1748,4 +1754,21 @@
     .footer-link li {
       margin-left: 0;
     }
+  }
+.full-image {
+    margin: 3em auto;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    max-width: 900px;
+  }
+
+  .full-image img {
+    width: 100%;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .full-image:hover img {
+    transform: scale(1.03);
   }
