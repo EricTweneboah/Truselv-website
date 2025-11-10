@@ -421,7 +421,7 @@
   .navbar-brand img {
     max-width: 200px;
     transition: transform 0.3s ease;
-    filter: drop-shadow(0 12px 24px rgba(5,195,222,0.35));
+    filter: brightness(0) invert(1) drop-shadow(0 12px 24px rgba(5,195,222,0.35));
   }
 
   .navbar-brand:hover img {
@@ -555,15 +555,15 @@
   }
 
   .navbar-toggler {
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    padding: 0.35em;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
     cursor: pointer;
     margin: 0 10px 0 0;
     width: 38px;
     height: 38px;
     outline: none;
-    background: rgba(255,255,255,0.08);
+    background: transparent;
   }
 
   .navbar-toggler:focus {
