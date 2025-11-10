@@ -338,10 +338,39 @@
     color: rgba(255,255,255,0.9);
   }
 
-  .section-padding,
-  .section-padding-half,
+  .section-padding, 
+  .section-padding-half, 
   .project-detail {
     position: relative;
+  }
+
+  .content-on-light {
+    color: var(--p-color);
+  }
+
+  .content-on-light h1,
+  .content-on-light h2,
+  .content-on-light h3,
+  .content-on-light h4,
+  .content-on-light h5,
+  .content-on-light h6 {
+    color: var(--title-color);
+  }
+
+  .content-on-light p,
+  .content-on-light li,
+  .content-on-light span,
+  .content-on-light small,
+  .content-on-light td {
+    color: var(--p-color);
+  }
+
+  .content-on-light a {
+    color: var(--link-color);
+  }
+
+  .content-on-light a:hover {
+    color: var(--secondary-color);
   }
 
   .section-padding {
