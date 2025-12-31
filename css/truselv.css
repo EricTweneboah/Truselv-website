@@ -1534,6 +1534,21 @@
     margin-top: 5.3em;
   }
 
+  .site-footer > .footer-credit {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    z-index: 2;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+  }
+
+  .site-footer > .footer-credit a {
+    color: rgba(255,255,255,0.75);
+  }
+
 
 
   /*---------------------------------------
