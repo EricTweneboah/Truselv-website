@@ -63,9 +63,17 @@ a {
 }
 
 .brand img {
-  width: 148px;
+  width: 64px;
   height: 54px;
   object-fit: contain;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--navy);
+  font: 700 18px/1.1 "Plain-Bold", Arial, sans-serif;
 }
 
 .home-nav {
@@ -84,11 +92,11 @@ a {
 
 .home-hero {
   display: grid;
-  grid-template-columns: minmax(300px, 0.9fr) minmax(340px, 1.1fr);
+  grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 0.9fr);
   gap: clamp(28px, 5vw, 74px);
   align-items: center;
-  min-height: calc(100vh - 83px);
-  padding: clamp(34px, 6vw, 84px) clamp(18px, 5vw, 72px);
+  min-height: 680px;
+  padding: clamp(28px, 5vw, 70px) clamp(18px, 5vw, 72px);
 }
 
 .hero-image {
@@ -101,9 +109,8 @@ a {
 
 .hero-image img {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  padding: clamp(22px, 4vw, 54px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 .eyebrow {
@@ -122,9 +129,9 @@ p {
 }
 
 h1 {
-  max-width: 780px;
+  max-width: 620px;
   margin-bottom: 22px;
-  font: 700 clamp(42px, 7vw, 82px)/0.96 "Plain-Bold", Arial, sans-serif;
+  font: 700 clamp(40px, 6vw, 70px)/0.98 "Plain-Bold", Arial, sans-serif;
   letter-spacing: 0;
   color: var(--navy);
 }
@@ -143,8 +150,8 @@ h3 {
 
 p {
   color: var(--muted);
-  font-size: 18px;
-  line-height: 1.7;
+  font-size: 17px;
+  line-height: 1.55;
 }
 
 .hero-copy p:not(.eyebrow) {
@@ -202,7 +209,7 @@ p {
 
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   max-width: 1180px;
   margin: 0 auto;
@@ -216,10 +223,21 @@ p {
   box-shadow: 0 16px 42px rgba(16, 32, 51, 0.07);
 }
 
-.service-card img {
+.service-carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.service-carousel img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+  scroll-snap-align: start;
 }
 
 .service-card div {
@@ -291,7 +309,7 @@ p {
   }
 
   .service-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .contact-section {

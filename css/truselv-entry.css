@@ -78,11 +78,11 @@ h1 {
 }
 
 .intro {
-  max-width: 650px;
+  max-width: 520px;
   margin: 18px auto 0;
   color: var(--muted);
   font-size: 18px;
-  line-height: 1.65;
+  line-height: 1.45;
 }
 
 .choice-grid {
@@ -143,7 +143,7 @@ h1 {
 .card-description {
   color: var(--muted);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.4;
 }
 
 .card-action {
