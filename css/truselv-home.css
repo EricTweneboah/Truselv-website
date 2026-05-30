@@ -229,6 +229,7 @@ p {
   grid-auto-columns: 100%;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: thin;
 }
