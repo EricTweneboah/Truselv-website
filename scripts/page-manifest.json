@@ -1,0 +1,90 @@
+{
+  "index.html": {
+    "title": "The person beyond the diagnosis",
+    "description": "Meet Bedbord and TESS: digital bedside information and meaningful engagement, designed around the person receiving care."
+  },
+  "bedbord.html": {
+    "title": "Bedbord \u2014 a clearer, more personal bedside",
+    "description": "Explore the digital alternative to bedside whiteboards: clearer information, personal preferences and a practical time-saving calculator."
+  },
+  "tess.html": {
+    "title": "TESS \u2014 more moments that matter",
+    "description": "Explore the TESS tablet: communication, games, reminiscence, radio and entertainment. \u00a3120 with 12 months of TESS Premium included."
+  },
+  "book-demo.html": {
+    "title": "Book a free product demo",
+    "description": "Request a free demonstration of Bedbord or TESS for your hospital, care home or family."
+  },
+  "contact.html": {
+    "title": "Contact us",
+    "description": "Contact TruSelv about Bedbord, TESS, product support, privacy or partnerships."
+  },
+  "about.html": {
+    "title": "Our purpose",
+    "description": "Why TruSelv exists: digital healthcare designed around identity, dignity, connection and the person receiving care."
+  },
+  "team.html": {
+    "title": "Our team",
+    "description": "Meet Eric Tweneboah, Michaela Reynolds and Osam-Frimpong Schandorf, the founding team behind TruSelv."
+  },
+  "partnerships.html": {
+    "title": "Partnerships",
+    "description": "Explore a Bedbord or TESS pilot, from discovery and local assessment to training, measurement and review."
+  },
+  "resources.html": {
+    "title": "Resources & downloads",
+    "description": "Download Bedbord and TESS product briefs, a pilot planning guide, a procurement checklist and consumer cancellation form."
+  },
+  "roi-calculator.html": {
+    "title": "Bedbord time & ROI calculator",
+    "description": "Estimate potential staff time released and model Bedbord costs using your own assumptions, with transparent formulas and printable results."
+  },
+  "shop.html": {
+    "title": "Shop the TESS tablet",
+    "description": "Explore the \u00a3120 TESS tablet with 12 months of Premium, choose your quantity and review your order enquiry."
+  },
+  "support.html": {
+    "title": "FAQs & product support",
+    "description": "Answers to common Bedbord and TESS questions, plus practical routes for product support, accessibility and order help."
+  },
+  "privacy.html": {
+    "title": "Website privacy notice",
+    "description": "How information is handled when you browse this website, enquire about a product or ask for help."
+  },
+  "cookies.html": {
+    "title": "Cookies & local storage",
+    "description": "A straightforward explanation of the technology used by this website."
+  },
+  "terms.html": {
+    "title": "Website terms",
+    "description": "The terms for browsing and using the TruSelv marketing website."
+  },
+  "sales-terms.html": {
+    "title": "TESS sales & enquiry terms",
+    "description": "What the TESS offer means, how an enquiry works and what must be agreed before a purchase."
+  },
+  "returns.html": {
+    "title": "Delivery, cancellation & returns",
+    "description": "Practical information for TESS orders and a clear way to ask for help."
+  },
+  "acceptable-use.html": {
+    "title": "Acceptable use",
+    "description": "Practical boundaries for using the website and discussing Bedbord and TESS."
+  },
+  "legal.html": {
+    "title": "Company & website information",
+    "description": "Contact and contracting information for the TruSelv website."
+  },
+  "accessibility.html": {
+    "title": "Accessibility",
+    "description": "Our approach to making this website understandable and usable, and how to request an alternative."
+  },
+  "trust.html": {
+    "title": "Trust centre",
+    "description": "A transparent starting point for Bedbord and TESS safety, data protection, security, accessibility and procurement questions."
+  },
+  "safety.html": {
+    "title": "Product safety & responsible deployment",
+    "description": "Practical safety considerations for introducing Bedbord or TESS into a care setting."
+  }
+}

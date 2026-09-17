@@ -1,0 +1,26 @@
+node_modules/
+.env
+.env.*
+!.env.example
+__pycache__/
+.preview/
+test-results/
+
+# Local source kits; published derivatives are in assets/.
+/Videos/
+/tess_marketing_kit/
+/images/TruSelv_Brand_Kit/*
+!/images/TruSelv_Brand_Kit/03_Typography/
+!/images/TruSelv_Brand_Kit/01_Logos/
+/images/TruSelv_Brand_Kit/01_Logos/*
+!/images/TruSelv_Brand_Kit/01_Logos/PNG/
+/images/TruSelv_Brand_Kit/01_Logos/PNG/*
+!/images/TruSelv_Brand_Kit/01_Logos/PNG/Primary/
+/images/TruSelv_Brand_Kit/01_Logos/PNG/Primary/*
+!/images/TruSelv_Brand_Kit/01_Logos/PNG/Primary/truselv-logo-horizontal-primary-2400.png
+# Private keys, credentials and local diagnostic output.
+*.pem
+*.key
+*.p12
+*.pfx
+*.log

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bedbord time &amp; ROI calculator | TruSelv</title>
+<meta name="description" content="Estimate potential staff time released and model Bedbord costs using your own assumptions, with transparent formulas and printable results.">
+<meta name="theme-color" content="#14283b">
+<link rel="canonical" href="https://truselv.co.uk/roi-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bedbord time &amp; ROI calculator | TruSelv">
+<meta property="og:description" content="Estimate potential staff time released and model Bedbord costs using your own assumptions, with transparent formulas and printable results.">
+<meta property="og:url" content="https://truselv.co.uk/roi-calculator.html">
+<meta property="og:image" content="https://truselv.co.uk/assets/tess-care_home_lifestyle.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preload" href="assets/Manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "TruSelv", "url": "https://truselv.co.uk", "logo": "https://truselv.co.uk/assets/logo.svg", "email": "support@truselv.co.uk"}</script>
+<script src="js/site-config.js" defer>
+</script>
+<script src="js/site.js" defer>
+</script>
+<noscript>
+<style>.menu-toggle,form[data-inquiry],#order-form,#review-order,.quantity button,.gallery-thumbs,.resource-tools,#roi-form,[data-cookie-settings],#video-toggle,#video-sound{display:none!important}@media(max-width:820px){.header-inner{height:auto;align-items:flex-start;flex-direction:column;padding-block:16px}.navigation{display:flex;position:static;max-height:none;padding:0;gap:14px;flex-wrap:wrap}.navigation>a{padding:5px}}</style>
+</noscript>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="container header-inner">
+<a class="logo" href="index.html" aria-label="TruSelv home">
+<img src="assets/logo.svg" width="164" height="57" alt="TruSelv">
+</a>
+<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">☰</span>
+</button>
+<nav class="navigation" id="navigation" aria-label="Main navigation">
+<details class="nav-products">
+<summary>Our products <span aria-hidden="true">⌄</span>
+</summary>
+<div class="product-menu">
+<a href="bedbord.html">
+<strong>Bedbord</strong>
+<small>A clearer picture at the bedside.</small>
+</a>
+<a href="tess.html">
+<strong>TESS</strong>
+<small>More moments that matter.</small>
+</a>
+<a href="shop.html">
+<strong>Shop TESS</strong>
+<small>Tablet + 12 months of Premium.</small>
+</a>
+</div>
+</details>
+<a href="about.html">Our purpose</a>
+<a href="resources.html">Resources</a>
+<a href="trust.html">Trust centre</a>
+<a class="btn " href="book-demo.html">Book a demo<span class="arrow" aria-hidden="true">↗</span>
+</a>
+</nav>
+</div>
+</header>
+<main id="main" tabindex="-1">
+<section class="page-hero ivory ">
+<div class="container">
+<p class="eyebrow">Bedbord · Time & ROI calculator</p>
+<h1>A few minutes.<br>A bigger picture.</h1>
+<p class="lead">Explore an illustrative business case using your own assumptions. This calculator estimates released staff capacity; it does not predict clinical outcomes or guaranteed cash savings.</p>
+</div>
+</section>
+<section class="section">
+<div class="container calculator">
+<div>
+<form id="roi-form">
+<div class="calculator-inputs">
+<div class="field ">
+<label for="beds">Number of beds</label>
+<input type="number" name="beds" id="beds" required min="1" max="10000" step="1" value="24">
+</div>
+<div class="field ">
+<label for="occupancy">Average occupancy (%)</label>
+<input type="number" name="occupancy" id="occupancy" required min="0" max="100" step="1" value="100">
+</div>
+<div class="field ">
+<label for="days">Operating days per year</label>
+<input type="number" name="days" id="days" required min="1" max="366" step="1" value="365">
+</div>
+<div class="field ">
+<label for="manual">Current board work (min / bed / day)</label>
+<input type="number" name="manual" id="manual" required min="0" max="240" step="0.5" value="8">
+</div>
+<div class="field ">
+<label for="digital">Digital board work (min / bed / day)</label>
+<input type="number" name="digital" id="digital" required min="0" max="240" step="0.5" value="3">
+</div>
+<div class="field ">
+<label for="hourly">Staff cost (£ / hour)</label>
+<input type="number" name="hourly" id="hourly" required min="0" max="500" step="0.5" value="25">
+</div>
+<div class="field ">
+<label for="consumables">Avoidable consumables (£ / year)</label>
+<input type="number" name="consumables" id="consumables" required min="0" max="1000000" step="1" value="0">
+</div>
+<div class="field ">
+<label for="upfront">One-off project cost (£)</label>
+<input type="number" name="upfront" id="upfront" required min="0" max="10000000" step="1" value="0">
+</div>
+<div class="field ">
+<label for="annual">Annual running cost (£)</label>
+<input type="number" name="annual" id="annual" required min="0" max="10000000" step="1" value="0">
+</div>
+</div>
+<p class="note">Include only avoidable writing and erasing in board-work time. Keep essential device cleaning and clinical checks in your digital estimate. Running costs should include software, support, energy and replacement provision.</p>
+<button class="btn outline" type="reset">Reset example</button>
+<p id="roi-error" class="error-message" role="alert" hidden>Please enter valid numbers within the displayed limits.</p>
+</form>
+</div>
+<div class="calculator-output" aria-live="polite" aria-atomic="true">
+<p class="eyebrow">Your illustrative annual estimate</p>
+<div class="calc-stat">
+<span>Staff time released</span>
+<output class="number" id="roi-hours">730 hours</output>
+<small id="roi-time-detail">2 hours per operating day</small>
+</div>
+<div class="calc-stat">
+<span>Value of released capacity</span>
+<output class="number" id="roi-value">£18,250</output>
+<small>Staff hours × hourly cost; not necessarily a cash saving.</small>
+</div>
+<div class="calc-stat">
+<span>First-year net modelled value</span>
+<output class="number" id="roi-net">Add project costs</output>
+<small id="roi-return">Enter a supplier quote to calculate ROI and payback.</small>
+</div>
+<p class="small" id="roi-payback">
+</p>
+<button class="btn white" type="button" id="print-roi">Print / save estimate as PDF <span aria-hidden="true">↗</span>
+</button>
+<p class="small">Illustrative only. Validate assumptions in a pilot. Negative values mean the proposed workflow uses more time or costs more than the estimated benefit.</p>
+<noscript>
+<p>Enable JavaScript to recalculate your inputs. The figures above are a worked example.</p>
+</noscript>
+</div>
+</div>
+</section>
+<section class="section ivory">
+<div class="container narrow">
+<p class="eyebrow">Transparent by design</p>
+<h2>What goes into the estimate.</h2>
+<div class="document-body">
+<h3>Annual hours</h3>
+<p>Beds × occupancy ÷ 100 × operating days × (current minutes − digital minutes) ÷ 60.</p>
+<h3>First-year value</h3>
+<p>Released hours × staff cost, plus avoidable consumables, minus annual running costs and one-off project costs.</p>
+<h3>ROI and payback</h3>
+<p>First-year ROI = net modelled value ÷ total first-year costs × 100. Payback = one-off costs ÷ annual net benefit before one-off costs × 12 months. Payback is only shown when annual net benefit is positive and an upfront cost has been entered.</p>
+<h3>What this leaves out</h3>
+<p>Financing, discounting, tax, cost inflation and any unentered costs. Time released is staff capacity and only becomes a cash saving if your organisation can actually reduce expenditure. This is not a product performance study.</p>
+</div>
+</div>
+</section>
+<section class="section">
+<div class="container">
+<div class="cta dark">
+<div>
+<p class="eyebrow">A conversation is a good start</p>
+<h2>Put the assumptions<br>to the test.</h2>
+<p>Talk to us about a scoped Bedbord pilot and a tailored quote.</p>
+</div>
+<a class="btn teal" href="book-demo.html">Book a demo<span class="arrow" aria-hidden="true">↗</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="container">
+<div class="footer-top">
+<div class="footer-brand">
+<a href="index.html">
+<img src="assets/logo.svg" width="170" height="58" alt="TruSelv home" loading="lazy">
+</a>
+<p>The person beyond<br>the diagnosis.</p>
+</div>
+<div class="footer-column">
+<h2>Products</h2>
+<a href="bedbord.html">Bedbord</a>
+<a href="tess.html">TESS</a>
+<a href="shop.html">Shop TESS</a>
+<a href="roi-calculator.html">Time & ROI calculator</a>
+<a href="tess.html#download">Get the TESS app</a>
+</div>
+<div class="footer-column">
+<h2>Explore</h2>
+<a href="about.html">Our purpose</a>
+<a href="team.html">Our team</a>
+<a href="partnerships.html">Partnerships</a>
+<a href="resources.html">Resources</a>
+<a href="support.html">FAQs & support</a>
+<a href="contact.html">Contact us</a>
+</div>
+<div class="footer-column">
+<h2>Trust & safety</h2>
+<a href="trust.html">Trust centre</a>
+<a href="safety.html">Product safety</a>
+<a href="accessibility.html">Accessibility</a>
+<a href="acceptable-use.html">Acceptable use</a>
+<a href="book-demo.html">Book a demo</a>
+</div>
+<div class="footer-column">
+<h2>Legal</h2>
+<a href="privacy.html">Privacy notice</a>
+<a href="cookies.html">Cookie policy</a>
+<a href="terms.html">Website terms</a>
+<a href="sales-terms.html">Sales terms</a>
+<a href="returns.html">Delivery & returns</a>
+<a href="legal.html">Company information</a>
+<button type="button" data-cookie-settings>Cookie preferences</button>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2026 TruSelv. All rights reserved.</p>
+<a href="mailto:support@truselv.co.uk">support@truselv.co.uk</a>
+<span>Human-centred digital healthcare.</span>
+</div>
+</div>
+</footer>
+<dialog class="modal" id="cookie-dialog" aria-labelledby="cookie-title">
+<button class="modal-close" data-close-dialog aria-label="Close cookie preferences">×</button>
+<p class="eyebrow">Your privacy</p>
+<h2 id="cookie-title">A quieter kind of website.</h2>
+<p>This site uses no advertising cookies, analytics trackers or third-party video embeds. Fonts, images and videos are served with the site.</p>
+<div class="cookie-status">
+<span>Advertising & analytics</span>
+<span>Not used</span>
+</div>
+<p class="small" style="margin-top:20px">Forms and the basket stay in this page’s memory and are cleared when you leave or reload. Opening secure checkout loads Stripe’s payment form and necessary payment/fraud-prevention technology. Stripe’s privacy policy applies; see our cookie policy. App stores have their own policies.</p>
+<a href="cookies.html" class="text-link">Read the cookie policy</a>
+<div class="actions">
+<button class="btn" data-close-dialog>Done</button>
+</div>
+</dialog>
+</body>
+</html>

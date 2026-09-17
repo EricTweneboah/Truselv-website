@@ -1,0 +1,19 @@
+{
+  "name": "truselv-website",
+  "version": "2.0.0",
+  "private": true,
+  "description": "TruSelv — human-centred digital healthcare. Bedbord and TESS.",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "build": "python scripts/build_site.py && python scripts/build_pdfs.py",
+    "check": "python scripts/check_site.py",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "axe-core": "^4.13.0"
+  }
+}

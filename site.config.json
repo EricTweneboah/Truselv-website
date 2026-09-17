@@ -1,0 +1,21 @@
+{
+  "siteUrl": "https://truselv.co.uk",
+  "email": "support@truselv.co.uk",
+  "phone": "+44 7920 693839",
+  "address": "We Are Super, High St, Weston-super-Mare BS23 1HL, United Kingdom",
+  "legalName": "TRUSELV LTD",
+  "companyNumber": "17224419",
+  "registeredOffice": "9 Moorland Road, Weston-super-Mare, United Kingdom, BS23 4HW",
+  "vatNumber": "",
+  "salesReady": false,
+  "tessUnitPrice": 120,
+  "vatStatement": "VAT treatment will be confirmed in your quote before payment.",
+  "deliveryStatement": "Delivery cost and timing will be confirmed for your address before payment.",
+  "premiumRenewalStatement": "The price and options after the included 12 months will be confirmed before you order. No ongoing subscription is created by an enquiry.",
+  "bundleStatement": "One TESS tablet and 12 months of TESS Premium. Ask us to confirm the final hardware specification and accessories before ordering.",
+  "appStoreUrl": "",
+  "playStoreUrl": "",
+  "inquiryEndpoint": "",
+  "checkoutEndpoint": "",
+  "orderStatusEndpoint": ""
+}
