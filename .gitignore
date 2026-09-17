@@ -5,6 +5,10 @@ node_modules/
 __pycache__/
 .preview/
 test-results/
+.cloudflare-public/
+.wrangler/
+.dev.vars
+.dev.vars.*
 
 # Local source kits; published derivatives are in assets/.
 /Videos/

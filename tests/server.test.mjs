@@ -35,17 +35,6 @@ test('checkout stays disabled without explicit complete configuration', async t 
   assert.equal((await api.post('/api/checkout', { quantity: 1 })).status, 503);
   assert.equal((await api.post('/api/inquiries', {})).status, 503);
 });
-test('UK postcode lookup validates input, normalizes addresses and keeps credentials private', async t => {
-  let calls = 0;
-  const api = await fixture(t, base, { IDEAL_POSTCODES_API_KEY: 'private-lookup-key' }, async (url) => {
-    calls++; assert.match(url, /postcodes\/BS234HW\?api_key=/);
-    return new Response(JSON.stringify({ code: 2000, result: [{ line_1:'9 Moorland Road',line_2:'',post_town:'Weston-super-Mare',postcode:'BS23 4HW',county:'North Somerset', extra:'not-public' }] }));
-  });
-  assert.equal((await api.post('/api/addresses', {postcode:'bad'})).status, 422); assert.equal(calls,0);
-  const response = await api.post('/api/addresses', {postcode:'bs23 4hw'});
-  assert.deepEqual(await response.json(), {addresses:[{line1:'9 Moorland Road',line2:'',city:'Weston-super-Mare',postal_code:'BS23 4HW',state:'North Somerset',country:'GB'}]});
-  assert.doesNotMatch(await (await api.get('/js/site-config.js')).text(), /private-lookup-key/);
-});
 test('Resend demo uses fixed support recipient and visitor Reply-To', async t => {
   const api = await fixture(t, base, {RESEND_API_KEY:'secret-email-key',INQUIRY_FROM:'website@truselv.co.uk'}, async (url,options) => {
     assert.equal(url,'https://api.resend.com/emails');
@@ -59,24 +48,24 @@ test('Resend demo uses fixed support recipient and visitor Reply-To', async t =>
 test('cross-origin requests, invalid quantities and unacknowledged terms are rejected', async t => {
   const api = await fixture(t, ready, enabledEnv);
   assert.equal((await api.post('/api/checkout', {}, 'https://other.example')).status, 403);
-  for (const quantity of [0,-1,1.5,51,'2',null]) assert.equal((await api.post('/api/checkout', { quantity, email: 'buyer@example.com', termsAccepted: true })).status, 422);
+  for (const quantity of [0,-1,1.5,51,'2',null]) assert.equal((await api.post('/api/checkout', { quantity, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'} })).status, 422);
   assert.equal((await api.post('/api/checkout', { quantity: 1, email: 'buyer@example.com', termsAccepted: false })).status, 422);
 });
 test('embedded checkout uses verified server price and configured parameters, ignoring client amounts', async t => {
   const calls = [];
   const api = await fixture(t, ready, enabledEnv, async (url, options) => {
     calls.push([url,options]);
-    return new Response(JSON.stringify(url.includes('/prices/') ? { active: true, type: 'one_time', currency: 'gbp', unit_amount: 12000, tax_behavior: 'inclusive' } : { client_secret: 'cs_test_secret', id: 'cs_test_12345678901' }), { status: 200 });
+    return new Response(JSON.stringify(url.includes('/prices/') ? { active: true, type: 'one_time', currency: 'gbp', unit_amount: 11900, tax_behavior: 'unspecified' } : { client_secret: 'cs_test_secret', id: 'cs_test_12345678901' }), { status: 200 });
   });
-  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', termsAccepted: true, amount: 1, price: 'cheap', success_url: 'https://bad.example' });
+  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}, amount: 1, price: 'cheap', success_url: 'https://bad.example' });
   assert.equal(response.status, 200);
   const fields = new URLSearchParams(calls[1][1].body);
   assert.equal(fields.get('line_items[0][quantity]'), '2'); assert.equal(fields.get('line_items[0][price]'), 'price_test');
   assert.equal(fields.get('mode'), 'payment'); assert.equal(fields.get('ui_mode'), 'form'); assert.equal(fields.has('success_url'), false); assert.equal(fields.get('billing_address_collection'), 'auto'); assert.equal(fields.get('automatic_tax[enabled]'), 'false'); assert.match(calls[1][1].headers['Stripe-Version'], /custom_checkout_payment_form_preview=v1/); assert.deepEqual(await response.json(), {client_secret:'cs_test_secret',session_id:'cs_test_12345678901'});
 });
 test('a changed price or recurring price cannot be charged', async t => {
-  const api = await fixture(t, ready, enabledEnv, async () => new Response(JSON.stringify({ active: true, type: 'recurring', currency: 'gbp', unit_amount: 12000, tax_behavior: 'inclusive' })));
-  assert.equal((await api.post('/api/checkout', { quantity: 1, email: 'buyer@example.com', termsAccepted: true })).status, 503);
+  const api = await fixture(t, ready, enabledEnv, async () => new Response(JSON.stringify({ active: true, type: 'recurring', currency: 'gbp', unit_amount: 11900, tax_behavior: 'unspecified' })));
+  assert.equal((await api.post('/api/checkout', { quantity: 1, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'} })).status, 503);
 });
 test('order status only reports confirmed TESS payments and returns no personal data', async t => {
   let paid = false;
@@ -94,4 +83,11 @@ test('enquiry validation and provider failure cannot show false success', async 
   const api = await fixture(t, base, { RESEND_API_KEY: 'fake', INQUIRY_FROM: 'website@example.com' }, async () => new Response(JSON.stringify(success ? { id: 'test-message' } : { error: 'failed' }), { status: success ? 200 : 500 }));
   assert.equal((await api.post('/api/inquiries', data)).status, 502); success = true;
   assert.deepEqual(await (await api.post('/api/inquiries', data)).json(), { accepted: true });
+});
+
+test('checkout requires a complete delivery address', async t => {
+ const api = await fixture(t, ready, enabledEnv);
+ for (const shippingAddress of [undefined, {}, {line1:' ',city:'London',postal_code:'SW1A 1AA',country:'GB'}, {line1:'1 Road',city:'',postal_code:'SW1A 1AA',country:'GB'}]) {
+  assert.equal((await api.post('/api/checkout',{quantity:1,email:'buyer@example.com',termsAccepted:true,shippingAddress})).status,422);
+ }
 });

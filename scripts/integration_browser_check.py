@@ -16,8 +16,8 @@ with sync_playwright() as p:
     page.route('https://js.stripe.com/dahlia/stripe.js',lambda route:route.fulfill(content_type='text/javascript',body='''window.Stripe=(key,options)=>({initCheckoutFormSdk:settings=>{window.testSettings=settings;return {loadActions:async()=>({type:'success',actions:{confirm:async opts=>{window.testConfirm=opts;return {type:'error',error:{message:'Test decline: choose another payment method.'}}}}}),createForm:()=>({mount:selector=>{document.querySelector(selector).textContent='Mock secure payment form';},on:(name,handler)=>{window.testPayment=handler;},destroy:()=>{}})}}});'''))
     page.goto(URL+'/shop.html');page.locator('#review-order').click()
     page.locator('#order-name').fill('Test Visitor');page.locator('#order-email').fill('test@example.com')
-    page.locator('#order-postcode').fill('BS23 4HW');page.locator('#find-address').click()
-    page.locator('#address-results').select_option('0')
+    page.locator('#order-postcode').fill('BS23 4HW')
+    page.locator('#order-line1').fill('9 Moorland Road');page.locator('#order-city').fill('Weston-super-Mare')
     assert page.locator('#order-line1').input_value()=='9 Moorland Road'
     page.locator('#order-line2').fill('Reception')
     page.locator('input[name=terms]').check();page.locator('#checkout-button').click()
@@ -32,4 +32,4 @@ with sync_playwright() as p:
     assert not errors,errors
     page.screenshot(path='.preview/checkout-integration-mobile.png',full_page=True)
     browser.close()
-print('PASS: postcode selection, editable address, Stripe prefill, confirmation error, mobile layout; providers mocked.')
+print('PASS: manual required address, editable address, Stripe prefill, confirmation error, mobile layout; providers mocked.')

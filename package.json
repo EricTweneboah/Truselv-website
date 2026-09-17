@@ -8,12 +8,17 @@
     "start": "node --env-file-if-exists=.env server.mjs",
     "build": "python scripts/build_site.py && python scripts/build_pdfs.py",
     "check": "python scripts/check_site.py",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "build:cloudflare": "node scripts/package_cloudflare.mjs",
+    "dev:cloudflare": "npm run build:cloudflare && wrangler dev",
+    "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
+    "pretest": "npm run build:cloudflare"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
-    "axe-core": "^4.13.0"
+    "axe-core": "^4.13.0",
+    "wrangler": "^4.134.0"
   }
 }

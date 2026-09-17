@@ -2,6 +2,10 @@
 
 A complete static rebuild focused on **Bedbord** and **TESS**, using the supplied brand identity, locally served fonts, three product films and the new TESS tablet imagery.
 
+## Cloudflare hosting
+
+Follow [CLOUDFLARE_SETUP.md](CLOUDFLARE_SETUP.md) to deploy the website and API together on Cloudflare Workers. The deployment package includes only public assets; configure credentials as Worker secrets.
+
 ## Preview
 
 Requires Node 22 or later. No production npm dependencies are needed.
@@ -34,7 +38,9 @@ Generated HTML is included for direct static publishing. Edit the maintained sou
 | `css/site.css` | Responsive brand and print styles |
 | `js/site.js` | Browser interactions |
 | `site.config.json` | Public company/offer details, app links and integration settings |
-| `server.mjs` | Optional server and API endpoints |
+| `server.mjs` | Local Node server |
+| `api.mjs` | Shared enquiry and payment API |
+| `worker.mjs` | Cloudflare runtime |
 
 ```powershell
 python -m pip install -r requirements-dev.txt

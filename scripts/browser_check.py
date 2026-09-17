@@ -48,7 +48,7 @@ with sync_playwright() as p:
     page.goto(URL+'/shop.html')
     page.locator('[data-gallery]').nth(1).click();assert 'angled_bundle' in page.locator('#gallery-image').get_attribute('src')
     page.locator('#quantity').fill('0');page.locator('#review-order').click();assert page.locator('#quantity-error').is_visible()
-    page.locator('#quantity').fill('2');page.locator('#review-order').click();assert page.locator('#review-subtotal').inner_text()=='£240'
+    page.locator('#quantity').fill('2');page.locator('#review-order').click();assert page.locator('#review-subtotal').inner_text()=='£238'
     page.locator('#order-name').fill('Test Person');page.locator('#order-email').fill('test@example.com');page.locator('#order-postcode').fill('BS23 1HL');page.locator('#order-line1').fill('1 Test Street');page.locator('#order-city').fill('Weston-super-Mare');page.locator('input[name=terms]').check()
     page.locator('#checkout-button').click()
     assert 'Nothing has been sent yet' in page.locator('#order-result').inner_text()

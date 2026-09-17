@@ -198,35 +198,6 @@
       const names = new Intl.DisplayNames(['en-GB'], { type: 'region' });
       config.shippingCountries.filter(code => code !== 'GB').sort((a,b) => names.of(a).localeCompare(names.of(b))).forEach(code => country.add(new Option(names.of(code), code)));
     }
-    const finder = $('#find-address'), addressStatus = $('#address-status'), addressResults = $('#address-results');
-    let foundAddresses = [], lookupVersion = 0;
-    const clearAddresses = () => { lookupVersion++; foundAddresses = []; addressResults.replaceChildren(); addressResults.hidden = true; $('#address-results-label').hidden = true; };
-    $('#order-postcode').addEventListener('input', clearAddresses);
-    country.addEventListener('change', () => { clearAddresses(); finder.hidden = !config.addressEndpoint || country.value !== 'GB'; });
-    finder.hidden = !config.addressEndpoint;
-    if (config.addressEndpoint) addressStatus.textContent = 'Find your UK address using a complete postcode, or enter it manually below.';
-    finder.addEventListener('click', async () => {
-      clearAddresses(); const version = lookupVersion; finder.disabled = true; addressStatus.textContent = 'Finding addresses…';
-      try {
-        const response = await fetch(config.addressEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postcode: $('#order-postcode').value }), signal: AbortSignal.timeout(12000) });
-        const result = await response.json();
-        if (version !== lookupVersion) return;
-        if (!response.ok) throw new Error(result.error || 'Lookup unavailable. Enter your address manually.');
-        foundAddresses = result.addresses || [];
-        addressResults.add(new Option('Select your address', ''));
-        foundAddresses.forEach((a,i) => addressResults.add(new Option([a.line1,a.line2,a.city,a.postal_code].filter(Boolean).join(', '), String(i))));
-        addressResults.hidden = $('#address-results-label').hidden = !foundAddresses.length;
-        addressStatus.textContent = foundAddresses.length ? `${foundAddresses.length} addresses found. Select yours, or enter it manually if missing.` : 'No addresses found. Check your postcode or enter your address manually.';
-        if (foundAddresses.length) addressResults.focus();
-      } catch (e) { if (version === lookupVersion) addressStatus.textContent = e.name === 'TimeoutError' ? 'Lookup timed out. Enter your address manually.' : e.message; }
-      finally { finder.disabled = false; }
-    });
-    addressResults.addEventListener('change', () => {
-      const address = addressResults.value === '' ? null : foundAddresses[Number(addressResults.value)];
-      if (!address) return;
-      for (const [field,key] of Object.entries({ line1:'line1',line2:'line2',city:'city',state:'state',postcode:'postal_code' })) $(`#order-${field}`).value = address[key] || '';
-      addressStatus.textContent = 'Address filled in. Check it and make any corrections below.';
-    });
     let stripeScript;
     function loadStripe() {
       if (window.Stripe) return Promise.resolve();
@@ -251,13 +222,13 @@
       const data = Object.fromEntries(new FormData(form));
       const error = $('.error-message', form), submit = $('#checkout-button');
       error.hidden = true;
-      const body = `TESS tablet order enquiry\n\nName: ${data['order-name']}\nEmail: ${data['order-email']}\nOrganisation: ${data['order-organisation'] || 'Individual'}\nDelivery address: ${[data['order-line1'], data['order-line2'], data['order-city'], data['order-state'], data['order-postcode'], data['order-country']].filter(Boolean).join(', ')}\nQuantity: ${orderQuantity}\nProduct subtotal: ${money(orderQuantity * config.tessUnitPrice)}\nOffer: One tablet and 12 months of TESS Premium per tablet.\n\nPlease confirm availability, final hardware/accessories, VAT, delivery cost and timing, activation and renewal terms, legal seller and the full payable price before purchase.\n\nThis is an enquiry, not a confirmed purchase.`;
+      const body = `TESS tablet order enquiry\n\nName: ${data['order-name']}\nEmail: ${data['order-email']}\nOrganisation: ${data['order-organisation'] || 'Individual'}\nDelivery address: ${[data['order-line1'], data['order-line2'], data['order-city'], data['order-state'], data['order-postcode'], data['order-country']].filter(Boolean).join(', ')}\nQuantity: ${orderQuantity}\nProduct subtotal: ${money(orderQuantity * config.tessUnitPrice)}\nOffer: One tablet per tablet.\n\nPlease confirm availability, final hardware/accessories, VAT, delivery cost and timing, setup and support details, legal seller and the full payable price before purchase.\n\nThis is an enquiry, not a confirmed purchase.`;
       if (!checkoutEnabled && !config.inquiryEndpoint) { showStep(3); emailReview($('#order-result'), 'TESS tablet order enquiry', body); return; }
       submit.disabled = true;
       try {
         if (checkoutEnabled) {
           await loadStripe();
-          const response = await fetch(config.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity: orderQuantity, email: data['order-email'], termsAccepted: true }), signal: AbortSignal.timeout(15000) });
+          const response = await fetch(config.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity: orderQuantity, email: data['order-email'], termsAccepted: true, shippingAddress: { line1: data['order-line1'], city: data['order-city'], postal_code: data['order-postcode'], country: data['order-country'] } }), signal: AbortSignal.timeout(15000) });
           const result = await response.json();
           if (!response.ok || !result.client_secret || !result.session_id) throw new Error(result.error || 'Checkout could not be opened. Please contact us.');
           if (embeddedCheckout) embeddedCheckout.destroy();
