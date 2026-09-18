@@ -28,7 +28,7 @@ test('static files and byte-range video work; source secrets stay private', asyn
 });
 test('checkout stays disabled without explicit complete configuration', async t => {
   assert.equal(checkoutReady(base, enabledEnv), true);
-  assert.equal(checkoutReady(base, {...enabledEnv, STRIPE_SECRET_KEY: 'sk_live_fake', STRIPE_PUBLISHABLE_KEY: 'pk_live_fake'}), false);
+  assert.equal(checkoutReady({...base,salesReady:false}, {...enabledEnv, STRIPE_SECRET_KEY: 'sk_live_fake', STRIPE_PUBLISHABLE_KEY: 'pk_live_fake'}), false);
   assert.equal(checkoutReady(ready, {...enabledEnv, STRIPE_PUBLISHABLE_KEY: 'pk_live_fake'}), false);
   assert.equal(checkoutReady(ready, {}), false);
   const api = await fixture(t);
@@ -57,10 +57,16 @@ test('embedded checkout uses verified server price and configured parameters, ig
     calls.push([url,options]);
     return new Response(JSON.stringify(url.includes('/prices/') ? { active: true, type: 'one_time', currency: 'gbp', unit_amount: 11900, tax_behavior: 'unspecified' } : { client_secret: 'cs_test_secret', id: 'cs_test_12345678901' }), { status: 200 });
   });
-  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}, amount: 1, price: 'cheap', success_url: 'https://bad.example' });
+  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}, amount: 1, shippingAmount: 1, price: 'cheap', success_url: 'https://bad.example' });
   assert.equal(response.status, 200);
   const fields = new URLSearchParams(calls[1][1].body);
   assert.equal(fields.get('line_items[0][quantity]'), '2'); assert.equal(fields.get('line_items[0][price]'), 'price_test');
+  assert.deepEqual(fields.getAll('shipping_address_collection[allowed_countries][0]'), ['GB']);
+  assert.equal(fields.has('shipping_address_collection[allowed_countries][1]'), false);
+  assert.equal(fields.get('shipping_options[0][shipping_rate_data][fixed_amount][amount]'), '0');
+  assert.equal(fields.get('shipping_options[1][shipping_rate_data][fixed_amount][amount]'), '499');
+  assert.equal(fields.get('shipping_options[1][shipping_rate_data][fixed_amount][currency]'), 'gbp');
+  assert.equal(fields.get('shipping_options[1][shipping_rate_data][display_name]'), 'Next working day (order before 6pm UK time)');
   assert.equal(fields.get('mode'), 'payment'); assert.equal(fields.get('ui_mode'), 'form'); assert.equal(fields.has('success_url'), false); assert.equal(fields.get('billing_address_collection'), 'auto'); assert.equal(fields.get('automatic_tax[enabled]'), 'false'); assert.match(calls[1][1].headers['Stripe-Version'], /custom_checkout_payment_form_preview=v1/); assert.deepEqual(await response.json(), {client_secret:'cs_test_secret',session_id:'cs_test_12345678901'});
 });
 test('a changed price or recurring price cannot be charged', async t => {
@@ -87,7 +93,7 @@ test('enquiry validation and provider failure cannot show false success', async 
 
 test('checkout requires a complete delivery address', async t => {
  const api = await fixture(t, ready, enabledEnv);
- for (const shippingAddress of [undefined, {}, {line1:' ',city:'London',postal_code:'SW1A 1AA',country:'GB'}, {line1:'1 Road',city:'',postal_code:'SW1A 1AA',country:'GB'}]) {
+ for (const shippingAddress of [undefined, {}, {line1:"1 Road",city:"Paris",postal_code:"75001",country:"FR"}, {line1:' ',city:'London',postal_code:'SW1A 1AA',country:'GB'}, {line1:'1 Road',city:'',postal_code:'SW1A 1AA',country:'GB'}]) {
   assert.equal((await api.post('/api/checkout',{quantity:1,email:'buyer@example.com',termsAccepted:true,shippingAddress})).status,422);
  }
 });

@@ -18,7 +18,7 @@
     "simple": { "limit": 12, "period": 60 }
   }],
   "vars": {
-    "CHECKOUT_ENABLED": "false",
+    "CHECKOUT_ENABLED": "true",
     "INQUIRY_FROM": "TruSelv website <website@truselv.co.uk>"
   },
   "observability": { "enabled": false }

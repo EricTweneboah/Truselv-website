@@ -1,4 +1,4 @@
-export const SHIPPING_COUNTRIES = 'CA MX US AG AI AW BB BL BM BQ BS BZ CR CW DM DO GD GL GP GT HN HT JM KN KY LC MF MQ MS NI PA PM PR SV SX TC TT VC VG AR BO BR BV CL CO EC FK GF GS GY PE PY SR UY VE AD AL AT AX BA BE BG BY CH CZ DE DK EE ES FI FO FR GB GG GI GR HR HU IE IM IS IT JE LI LT LU LV MC MD ME MK MT NL NO PL PT RO RS RU SE SI SJ SK SM UA VA AO BF BI BJ BW CD CF CG CI CM CV DJ DZ EG ER ET GA GH GM GN GQ GW IO KE KM LR LS LY MA MG ML MR MU MW MZ NA NE NG RE RW SC SH SL SN SO SS ST SZ TD TF TG TN TZ UG YT ZA ZM ZW'.split(' ');
+export const SHIPPING_COUNTRIES = ['GB'];
 const STRIPE_VERSION = '2026-08-26.dahlia; custom_checkout_payment_form_preview=v1';
 export function validateInquiry(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return 'Invalid request.';
@@ -94,6 +94,14 @@ export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
           const price = await stripe(`prices/${encodeURIComponent(env.STRIPE_PRICE_ID)}`);
           if (!price.active || price.type !== 'one_time' || price.currency !== 'gbp' || price.unit_amount !== config.tessUnitPrice * 100) return json(503, { error: 'The product price needs review. Please contact TruSelv.' });
           const fields = new URLSearchParams({ mode: 'payment', ui_mode: 'form', 'line_items[0][price]': env.STRIPE_PRICE_ID, 'line_items[0][quantity]': String(data.quantity), billing_address_collection: 'auto', submit_type: 'auto', 'phone_number_collection[enabled]': 'false', 'automatic_tax[enabled]': 'false', integration_identifier: 'custom_embedded_web_0001' });
+          // Shipping is charged once per order, with free standard delivery first.
+          [{name:'Standard UK delivery (3-5 working days)',amount:0}, {name:'Next working day (order before 6pm UK time)',amount:499}].forEach((option,index) => {
+            const prefix = `shipping_options[${index}][shipping_rate_data]`;
+            fields.set(`${prefix}[type]`, 'fixed_amount');
+            fields.set(`${prefix}[fixed_amount][amount]`, String(option.amount));
+            fields.set(`${prefix}[fixed_amount][currency]`, 'gbp');
+            fields.set(`${prefix}[display_name]`, option.name);
+          });
           SHIPPING_COUNTRIES.forEach((country, index) => fields.set(`shipping_address_collection[allowed_countries][${index}]`, country));
           const session = await stripe('checkout/sessions', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Idempotency-Key': randomUUID() }, body: fields.toString() });
           if (!session.client_secret || !session.id) return json(502, { error: 'The checkout could not be initialized.' });

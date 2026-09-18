@@ -23,10 +23,10 @@ The existing REST call remains in `api.mjs`; no Stripe SDK installation is requi
 | phone_number_collection.enabled | false |
 | automatic_tax.enabled | false |
 | submit_type | auto |
-| shipping_address_collection.allowed_countries | Complete supplied country list, stored as SHIPPING_COUNTRIES in api.mjs |
+| shipping_address_collection.allowed_countries | UK only (GB), stored as SHIPPING_COUNTRIES in api.mjs |
 | integration_identifier | custom_embedded_web_0001 |
 
-`payment_method_collection` is omitted because this is payment mode. Old redirect URLs, shipping rate, metadata, card-only restriction and other unconfigured Session parameters were removed. Customer email and selected address are provided through the SDK's `defaultValues`. The existing Price amount/currency/type validation remains server-side. The endpoint returns `client_secret` plus `session_id`; it never redirects to `session.url`.
+`payment_method_collection` is omitted because this is payment mode. Old redirect URLs, metadata, card-only restriction and other unconfigured Session parameters were removed. Customer email and selected address are provided through the SDK's `defaultValues`. The existing Price amount/currency/type validation remains server-side. The endpoint returns `client_secret` plus `session_id`; it never redirects to `session.url`.
 
 Stripe.js loads only when opening checkout, from `https://js.stripe.com/dahlia/stripe.js`, with `custom_checkout_payment_form_1`. The supplied appearance settings and expanded layout are preserved. Confirmation passes the form event, a same-site return URL and `redirect: if_required`. Status is checked against Stripe and the configured product Price ID, without exposing customer information. This is a one-time payment, not a recurring subscription.
 
