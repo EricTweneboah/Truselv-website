@@ -46,3 +46,20 @@ Then add `truselv.co.uk` and `www.truselv.co.uk` using the Worker's Domains & Ro
 Use `npx wrangler deploy --dry-run` to validate without publishing. Do not change Cloudflare plans or add paid services for this setup. API rate limiting is applied per IP/method using Cloudflare's rate limiter; it is approximate and local to Cloudflare locations, not a global abuse guarantee.
 
 References: [Static assets](https://developers.cloudflare.com/workers/static-assets/), [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/), [Secrets](https://developers.cloudflare.com/workers/configuration/secrets/).
+
+## Activate order emails
+
+The deployed endpoint is `https://truselv.co.uk/api/stripe-webhook`.
+In Stripe live mode, create a webhook event destination for your own account with:
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+
+Copy its signing secret into Cloudflare runtime secrets as `STRIPE_WEBHOOK_SECRET` and deploy the secret update. Never commit or share the value. Sandbox endpoints have separate signing secrets and must use matching sandbox API credentials.
+
+Both emails are sent through the existing Resend sender after signature and paid-order verification. This works even if the buyer closes the checkout page. The buyer gets the quantity, total, delivery service and address; support receives the same details plus buyer email. These are order emails, separate from Stripe payment receipts. Provider acceptance is not proof of inbox delivery: check Resend delivery events and spam folders.
+
+Delivery acceptance IDs are stored in Checkout Session metadata (`order_email_buyer` and `order_email_support`). Each recipient also has a stable Resend idempotency key. Partial failures return a non-2xx response so Stripe can retry. An uncertain send older than 23 hours returns an error for manual reconciliation, because Resend only retains idempotency keys for 24 hours. Check the Resend log before clearing a `_started` marker; if already sent, record its email ID in the corresponding metadata field instead. Never clear a sent marker just to retry another recipient.
+
+Fulfilment remains manual. No old purchases are automatically emailed; an event resend can process an eligible past paid Session. Verify both recipients with an intended order or a separate sandbox setup. Automated tests mock providers and do not send real mail or charge a card.
+
+References: https://docs.stripe.com/webhooks/signature and https://resend.com/changelog/idempotency-keys

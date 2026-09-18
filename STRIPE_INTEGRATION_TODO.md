@@ -61,3 +61,7 @@ Manual fulfilment remains required: check successful paid Sessions in the Stripe
 ## Cloudflare deployment
 
 Use [CLOUDFLARE_SETUP.md](CLOUDFLARE_SETUP.md) for hosting and runtime secrets. Local `.env` is not uploaded. Sandbox checkout and receipt delivery have been confirmed by the owner; production deployment and live-mode activation remain separate steps.
+
+## Order confirmation emails
+
+The signed webhook `/api/stripe-webhook` now sends buyer and support emails after payment verification. Activate the event destination and `STRIPE_WEBHOOK_SECRET` using CLOUDFLARE_SETUP.md. Order delivery remains manual.

@@ -1,3 +1,4 @@
+import {orderWebhook} from './order-emails.mjs';
 export const SHIPPING_COUNTRIES = ['GB'];
 const STRIPE_VERSION = '2026-08-26.dahlia; custom_checkout_payment_form_preview=v1';
 export function validateInquiry(data) {
@@ -57,6 +58,10 @@ export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
     try {
       const url = new URL(request.url);
       if (!['GET','POST'].includes(request.method)) return json(405, {error:'Method not allowed.'});
+      if (url.pathname === '/api/stripe-webhook' && request.method === 'POST') {
+        await orderWebhook(request,{env,stripe,fetcher});
+        return json(200,{received:true});
+      }
       if (request.method === 'POST' && request.headers.get('origin') !== siteUrl) return json(403, {error:'This request must come from the TruSelv website.'});
       if (rateLimit) {
         if (!await rateLimit(clientIP + ':' + request.method)) return json(429, {error:'Too many requests. Please try again later.'});
