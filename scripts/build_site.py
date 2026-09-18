@@ -70,12 +70,13 @@ def footer():
 <dialog class="modal" id="cookie-dialog" aria-labelledby="cookie-title"><button class="modal-close" data-close-dialog aria-label="Close cookie preferences">×</button><p class="eyebrow">Your privacy</p><h2 id="cookie-title">A quieter kind of website.</h2><p>This site uses no advertising cookies, analytics trackers or third-party video embeds. Fonts, images and videos are served with the site.</p><div class="cookie-status"><span>Advertising & analytics</span><span>Not used</span></div><p class="small" style="margin-top:20px">Forms and the basket stay in this page’s memory and are cleared when you leave or reload. Opening secure checkout loads Stripe’s payment form and necessary payment/fraud-prevention technology. Stripe’s privacy policy applies; see our cookie policy. App stores have their own policies.</p><a href="cookies.html" class="text-link">Read the cookie policy</a><div class="actions"><button class="btn" data-close-dialog>Done</button></div></dialog>'''
 
 def page(file, title, description, body, active=None, noindex=False):
-    url = CONFIG['siteUrl'].rstrip('/') + ('/' if file=='index.html' else '/'+file)
+    url = CONFIG['siteUrl'].rstrip('/') + ('/' if file=='index.html' else '/'+file.removesuffix('.html'))
     schema = {'@context':'https://schema.org','@type':'Organization','name':'TruSelv','url':CONFIG['siteUrl'],'logo':CONFIG['siteUrl']+'/assets/logo.svg','email':CONFIG['email']}
     no_js = '<noscript><style>.menu-toggle,form[data-inquiry],#order-form,#review-order,.quantity button,.gallery-thumbs,.resource-tools,#roi-form,[data-cookie-settings],#video-toggle,#video-sound{{display:none!important}}@media(max-width:820px){{.header-inner{{height:auto;align-items:flex-start;flex-direction:column;padding-block:16px}}.navigation{{display:flex;position:static;max-height:none;padding:0;gap:14px;flex-wrap:wrap}}.navigation>a{{padding:5px}}}}</style></noscript>'.replace('{{','{').replace('}}','}')
     doc = f'''<!doctype html>
 <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{E(title)} | TruSelv</title><meta name="description" content="{E(description)}"><meta name="theme-color" content="#14283b"><link rel="canonical" href="{url}"><meta property="og:type" content="website"><meta property="og:title" content="{E(title)} | TruSelv"><meta property="og:description" content="{E(description)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{CONFIG['siteUrl']}/assets/tess-care_home_lifestyle.webp"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="assets/favicon.ico"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><link rel="preload" href="assets/Manrope.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="css/site.css">{'<meta name="robots" content="noindex,follow">' if noindex else ''}<script type="application/ld+json">{json.dumps(schema)}</script><script src="js/site-config.js" defer></script><script src="js/site.js" defer></script></head><body>{header(active or file)}<main id="main" tabindex="-1">{body}</main>{footer()}</body></html>'''
     doc=doc.replace('</head>',no_js+'</head>')
+    doc=re.sub(r'href="(?:/)?([a-zA-Z0-9-]+)\.html([?\#][^"]*)?"', lambda m: 'href="'+('/' if m[1]=='index' else '/'+m[1])+(m[2] or '')+'"', doc)
     (ROOT/file).write_text(doc.replace('><','>\n<'),encoding='utf-8')
     if not noindex: PAGES[file]={'title':title,'description':description}
 
@@ -222,8 +223,9 @@ def build_redirects():
     for old,new in redirects.items():
         redirect_lines.append('/'+old+' /'+new.replace('../','')+' 301')
         if '/' not in old: redirect_lines.append('/'+old.removesuffix('.html')+' /'+new+' 301')
-    redirect_lines += ['/'+p.removesuffix('.html')+' /'+p+' 301' for p in PAGES if p!='index.html']
-    (ROOT/'_redirects').write_text('\n'.join(redirect_lines)+'\n/more/ /resources.html 301\n',encoding='utf-8')
+    redirect_lines = [re.sub(r' /([^ ]+)\.html ', lambda m: ' '+('/' if m[1]=='index' else '/'+m[1])+' ', line) for line in redirect_lines]
+    redirect_lines += ['/index.html / 301']
+    (ROOT/'_redirects').write_text('\n'.join(redirect_lines)+'\n/more/ /resources 301\n',encoding='utf-8')
 
 def main():
     (ROOT/'js/site-config.js').write_text('window.TRUSELV_CONFIG = '+json.dumps(CONFIG,ensure_ascii=False,indent=2)+';\n',encoding='utf-8')
@@ -235,8 +237,8 @@ def main():
     # Root-relative links are needed on a 404 served for an arbitrary nested URL.
     p=ROOT/'404.html'; t=p.read_text(encoding='utf-8'); t=re.sub(r'(href|src)="(?!https?:|mailto:|tel:|#|/)([^"]+)"',r'\1="/\2"',t); p.write_text(t,encoding='utf-8')
     build_redirects()
-    (ROOT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+CONFIG['siteUrl']+('/' if f=='index.html' else '/'+f)+'</loc></url>' for f in PAGES)+'</urlset>\n',encoding='utf-8')
-    (ROOT/'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /order-status.html\nSitemap: '+CONFIG['siteUrl']+'/sitemap.xml\n',encoding='utf-8')
+    (ROOT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+CONFIG['siteUrl']+('/' if f=='index.html' else '/'+f.removesuffix('.html'))+'</loc></url>' for f in PAGES)+'</urlset>\n',encoding='utf-8')
+    (ROOT/'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /order-status\nSitemap: '+CONFIG['siteUrl']+'/sitemap.xml\n',encoding='utf-8')
     (ROOT/'scripts/page-manifest.json').write_text(json.dumps(PAGES,indent=2),encoding='utf-8')
     print(f'Built {len(PAGES)} substantive pages, checkout status, 404 and legacy redirects.')
 

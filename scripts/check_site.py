@@ -35,6 +35,7 @@ def run():
             if u.scheme or u.netloc:continue
             target=ROOT/unquote(u.path).lstrip('/') if u.path.startswith('/') else path.parent/unquote(u.path) if u.path else path
             if target.is_dir():target=target/'index.html'
+            if not target.exists() and not target.suffix:target=target.with_suffix('.html')
             if not target.exists():errors.append(f'{name}: missing {href}');continue
             if target.stat().st_size==0:errors.append(f'{name}: empty {href}')
             if u.fragment and target.suffix=='.html':

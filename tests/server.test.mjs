@@ -18,8 +18,8 @@ async function fixture(t, config = base, env = {}, fetcher = () => { throw new E
 test('static files and byte-range video work; source secrets stay private', async t => {
   const api = await fixture(t);
   const home = await api.get('/'); assert.equal(home.status, 200); assert.match(await home.text(), /The person/);
-  const retired = await api.get('/home-improvements', { redirect: 'manual' }); assert.equal(retired.status, 301); assert.equal(retired.headers.get('location'), '/index.html');
-  const cleanUrl = await api.get('/tess', { redirect: 'manual' }); assert.equal(cleanUrl.status, 301); assert.equal(cleanUrl.headers.get('location'), '/tess.html');
+  const retired = await api.get('/home-improvements', { redirect: 'manual' }); assert.equal(retired.status, 301); assert.equal(retired.headers.get('location'), '/');
+  const cleanUrl = await api.get('/tess', { redirect: 'manual' }); assert.equal(cleanUrl.status, 200);
   for (const path of ['/.env','/site.config.json','/server.mjs','/.git/config','/scripts/build_site.py']) assert.equal((await api.get(path)).status, 404);
   const range = await api.get('/assets/welcome.mp4', { headers: { Range: 'bytes=0-99' } });
   assert.equal(range.status, 206); assert.equal((await range.arrayBuffer()).byteLength, 100);

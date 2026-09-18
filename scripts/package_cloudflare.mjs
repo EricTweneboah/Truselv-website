@@ -24,7 +24,7 @@ for(const file of files) {
   await mkdir(dirname(join(output,file)),{recursive:true});
   await copyFile(source,join(output,file));
 }
-await writeFile(join(output,'_redirects'), '/ /index.html 302\n' + await readFile(join(root,'_redirects'),'utf8'));
+await writeFile(join(output,'_redirects'), await readFile(join(root,'_redirects'),'utf8'));
 const csp="default-src 'self'; script-src 'self' https://js.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; connect-src 'self' https://api.stripe.com https://*.stripe.com; img-src 'self' data: https://*.stripe.com; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
 await writeFile(join(output,'_headers'),`/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n  Content-Security-Policy: ${csp}\n  Cache-Control: no-cache\n`);
 console.log(`Packaged ${files.length} public files. Environment files, source code and private configuration excluded.`);

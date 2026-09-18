@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /order-status.html
+Disallow: /order-status
 Sitemap: https://truselv.co.uk/sitemap.xml

@@ -39,13 +39,19 @@ export function createHandler({ config, env = process.env, fetcher = fetch, root
       }
       let pathname;
       try { pathname = decodeURIComponent(url.pathname); } catch { return json(res, 400, { error: 'Invalid URL.' }); }
+      if (pathname.endsWith('.html')) {
+        const name=pathname.slice(1,-5);
+        if (!['care','home-improvements','careers','folda','ngage','teevy','documentation','compliance-blog','edi-blog','innovation-blog','Partnership'].includes(name)) {
+          try { await stat(resolve(root,'.'+pathname)); res.writeHead(301,{Location:(name==='index' ? '/' : '/'+name)+url.search}); return res.end(); } catch {}
+        }
+      }
       if (pathname === '/') pathname = '/index.html';
-      if (pathname === '/more/' || pathname === '/more') { res.writeHead(301, { Location: '/resources.html' }); return res.end(); }
+      if (pathname === '/more/' || pathname === '/more') { res.writeHead(301, { Location: '/resources' }); return res.end(); }
       const retired = { care: 'index', 'home-improvements': 'index', careers: 'about', folda: 'bedbord', ngage: 'tess', teevy: 'tess', documentation: 'resources', 'compliance-blog': 'trust', 'edi-blog': 'accessibility', 'innovation-blog': 'about', Partnership: 'partnerships' };
       const routeName = pathname.slice(1).replace(/\.html$/, '');
-      if (retired[routeName]) { res.writeHead(301, { Location: '/' + retired[routeName] + '.html' }); return res.end(); }
+      if (retired[routeName]) { res.writeHead(301, { Location: (retired[routeName] === 'index' ? '/' : '/' + retired[routeName]) + url.search }); return res.end(); }
       if (/^\/[a-zA-Z0-9-]+$/.test(pathname)) {
-        try { await stat(resolve(root, '.' + pathname + '.html')); res.writeHead(301, { Location: pathname + '.html' }); return res.end(); } catch { /* Use the useful 404 below. */ }
+        try { await stat(resolve(root, '.' + pathname + '.html')); pathname += '.html'; } catch { /* Use the useful 404 below. */ }
       }
       const permitted = /^\/[a-zA-Z0-9-]+\.html$/.test(pathname) || /^\/(assets|downloads)\/[a-zA-Z0-9_.-]+$/.test(pathname) || /^\/(css\/site\.css|js\/site\.js|robots\.txt|sitemap\.xml)$/.test(pathname) || /^\/documents\/(Bedbord-solution|TruSelv-Investor-ready)\.pdf$/.test(pathname);
       const path = resolve(root, '.' + pathname);

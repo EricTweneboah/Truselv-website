@@ -247,9 +247,9 @@
           embeddedCheckout.on('confirm', async event => {
             if (confirming) return; confirming = true;
             try {
-              const confirmation = await loaded.actions.confirm({ formConfirmEvent: event, returnUrl: new URL(`order-status.html?session_id=${encodeURIComponent(result.session_id)}`, location.href).href, redirect: 'if_required' });
+              const confirmation = await loaded.actions.confirm({ formConfirmEvent: event, returnUrl: new URL(`/order-status?session_id=${encodeURIComponent(result.session_id)}`, location.href).href, redirect: 'if_required' });
               if (confirmation?.type === 'error') throw new Error(confirmation.error?.message || 'Payment could not be confirmed. Check the form.');
-              location.assign(`order-status.html?session_id=${encodeURIComponent(result.session_id)}`);
+              location.assign(`/order-status?session_id=${encodeURIComponent(result.session_id)}`);
             } catch (e) { $('#payment-error').hidden = false; $('#payment-error').textContent = e.message || 'Payment status is uncertain. Contact support before paying again.'; }
             finally { confirming = false; }
           });
