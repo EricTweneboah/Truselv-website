@@ -1,4 +1,5 @@
-﻿import {validEmail} from './api.mjs';
+import {orderEmailHtml} from './email-template.mjs';
+import {validEmail} from './api.mjs';
 const failure = (message,status=503) => Object.assign(new Error(message),{status});
 export async function verifyStripeEvent(request, secret, now=Date.now()) {
   const header=request.headers.get('stripe-signature') || '';
@@ -53,7 +54,10 @@ export async function orderWebhook(request,{env,stripe,fetcher}) {
     // An unresolved send older than Resend's deduplication window needs manual
     // reconciliation rather than risking another customer email.
     if(metadata[started] && Date.now()-Number(metadata[started])>23*60*60*1000)throw failure('Order email requires reconciliation.');
-    if(!metadata[started])await mark(started,String(Date.now()));
+    // Keep the original plain-text payload for retries started before this template.
+    const templateKey=key+'_template';
+    if(!metadata[started]) { await mark(templateKey,'2'); await mark(started,String(Date.now())); }
+    if(metadata[templateKey]==='2')message.html=orderEmailHtml({role:message.role,reference,quantity:lines[0].quantity,total:money(session.amount_total),delivery:session.shipping_cost?.shipping_rate?.display_name || 'UK delivery',deliveryCharge:money(session.total_details?.amount_shipping || 0),address,email,test:!live});
     const {role,...body}=message;
     const response=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`,'Content-Type':'application/json','Idempotency-Key':`tess-order-v1/${id}/${role}`},body:JSON.stringify({from:env.INQUIRY_FROM,...body}),signal:AbortSignal.timeout(10000)});
     if(!response.ok)throw failure('Order email could not be accepted.');
