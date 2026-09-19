@@ -100,7 +100,7 @@
     const label = document.createElement('label'); label.textContent = 'Your prepared message';
     const preview = document.createElement('textarea'); preview.readOnly = true; preview.value = body; preview.setAttribute('aria-label', 'Your prepared email message');
     const actions = document.createElement('div'); actions.className = 'actions';
-    const send = document.createElement('a'); send.className = 'btn'; send.textContent = 'Open email app ↗'; send.href = `mailto:${config.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const send = document.createElement('a'); send.className = 'btn'; send.textContent = 'Open email app'; send.href = `mailto:${config.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'btn outline'; copy.textContent = 'Copy message';
     copy.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(`To: ${config.email}\nSubject: ${subject}\n\n${body}`); copy.textContent = 'Copied'; }
@@ -124,7 +124,7 @@
 
   $$('form[data-inquiry]').forEach(form => {
     if (config.inquiryEndpoint) {
-      $('[data-form-submit]', form).textContent = form.dataset.inquiry === 'demo' ? 'Send demo request ↗' : 'Send enquiry ↗';
+      $('[data-form-submit]', form).textContent = form.dataset.inquiry === 'demo' ? 'Send demo request' : 'Send enquiry';
       $('[data-form-delivery]', form).textContent = 'Your request will be sent to TruSelv. Demo times are agreed by email.';
     }
     form.addEventListener('submit', async event => {
@@ -212,9 +212,9 @@
     }
     let embeddedCheckout;
     if (checkoutEnabled) {
-      $('#checkout-button').textContent = 'Continue to secure checkout ↗';
+      $('#checkout-button').textContent = 'Continue to secure checkout';
       $('#checkout-explanation').textContent = (config.checkoutTestMode ? 'Test checkout — no real payment will be taken. ' : '') + 'Review the total and delivery address in the secure Stripe form before paying. Card details go directly to Stripe.';
-    } else if (config.inquiryEndpoint) $('#checkout-button').textContent = 'Send order enquiry ↗';
+    } else if (config.inquiryEndpoint) $('#checkout-button').textContent = 'Send order enquiry';
     $('#order-form').addEventListener('submit', async event => {
       event.preventDefault();
       const form = event.currentTarget;
