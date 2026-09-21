@@ -1,0 +1,21 @@
+.tess-specification{background:#f4f8f6}
+.tess-specification .section-heading>p{font-size:19px;line-height:1.55}
+.tess-spec-grid{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.18fr);gap:28px;align-items:stretch}
+.tess-spec-card,.tess-included{background:#fff;border:1px solid #d8e2dd;border-radius:18px;padding:34px}
+.tess-spec-card{background:#14283b;color:#fff;box-shadow:0 18px 42px rgba(20,40,59,.12)}
+.tess-spec-card .eyebrow{color:#b9e9df}
+.tess-spec-card h3{font-size:31px;margin-bottom:30px}
+.tess-spec-list{margin:0}
+.tess-spec-list div{display:flex;justify-content:space-between;gap:18px;padding:14px 0;border-top:1px solid #49606f}
+.tess-spec-list dt{color:#d7e1e3;font-size:15px}
+.tess-spec-list dd{margin:0;text-align:right;font-weight:650;font-family:Manrope;font-size:15px}
+.tess-spec-list dd span{display:block;font:13px/1.35 'Source Sans 3',sans-serif;color:#b9c8cd;margin-top:3px}
+.tess-included-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tess-included-item{padding:17px;border:1px solid #d8e2dd;border-radius:10px;background:#fbfcfb}
+.tess-included-item h3{font-size:18px;margin-bottom:5px}
+.tess-included-item p{margin:0;font-size:14px;line-height:1.4}
+.tess-support-card{display:flex;gap:17px;align-items:flex-start;margin-top:20px;padding:20px;background:#e4f4ee;border-radius:12px}
+.tess-support-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#08786f;color:#fff;font-weight:700;flex:0 0 auto}
+.tess-support-card h3{font-size:20px;margin-bottom:5px}
+.tess-support-card p{margin:0;font-size:15px;line-height:1.45}
+@media(max-width:760px){.tess-spec-grid{grid-template-columns:1fr}.tess-spec-card,.tess-included{padding:26px}.tess-included-grid{grid-template-columns:1fr}.tess-specification .section-heading{display:block}.tess-specification .section-heading>p{margin-top:18px}}
