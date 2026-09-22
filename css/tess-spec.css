@@ -18,4 +18,10 @@
 .tess-support-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#08786f;color:#fff;font-weight:700;flex:0 0 auto}
 .tess-support-card h3{font-size:20px;margin-bottom:5px}
 .tess-support-card p{margin:0;font-size:15px;line-height:1.45}
+.tess-gallery-spec{margin-top:18px;padding:22px;border:1px solid #d8e2dd;border-radius:12px;background:#fff}
+.tess-gallery-spec h2{font-size:18px;letter-spacing:-.02em;margin:0 0 13px}
+.tess-gallery-spec ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.tess-gallery-spec li{position:relative;margin:0;padding-left:20px;color:#385260;font-size:15px;line-height:1.35}
+.tess-gallery-spec li::before{content:'✓';position:absolute;left:0;color:#08786f;font-weight:700}
+.tess-gallery-spec li span{display:block;font-size:13px;color:#62737b}
 @media(max-width:760px){.tess-spec-grid{grid-template-columns:1fr}.tess-spec-card,.tess-included{padding:26px}.tess-included-grid{grid-template-columns:1fr}.tess-specification .section-heading{display:block}.tess-specification .section-heading>p{margin-top:18px}}
