@@ -12,9 +12,20 @@ This is the separate, protected service for `portal.truselv.co.uk` and `admin.tr
 6. Protect both domains with Cloudflare Zero Trust Access. Require named work-email identities and MFA. The Worker trusts the Access identity header only after Access protects the route.
 7. Provision the first TruSelv administrator directly in D1. All other access is assigned through the admin workspace and the Cloudflare Access policy.
 
+## Upgrade: ward-scoped access
+
+For the deployed database, apply the ward migration once before deploying the updated Worker:
+
+```powershell
+npx wrangler d1 execute tess-facility-portal --remote --file=migrations/001_wards.sql
+npx wrangler deploy
+```
+
+Every new device must be assigned to a ward. Existing unassigned devices should be retired or re-registered after creating the appropriate wards.
+
 ## Data model and boundaries
 
-- `facility_users.facility_id` is the tenant boundary. Every facility query is scoped to the signed-in user’s facility.
+- `facility_users.facility_id` is the tenant boundary. Every facility query is scoped to the signed-in user’s facility; `ward_id` limits ward accounts to one ward.
 - Resident first name, last name and date of birth are encrypted before storage. Usage events use resident IDs rather than names.
 - The device activation key is shown once when a TESS device is registered. Only its SHA-256 hash is retained.
 - The portal is for service insight and management; it must not be presented as a clinical record or decision-support system.
@@ -25,8 +36,12 @@ This is the separate, protected service for `portal.truselv.co.uk` and `admin.tr
 |---|---|
 | `truselv_admin` | All facilities, onboarding, devices, licences and audit history |
 | `facility_admin` | One facility, people, residents, devices and reports |
+| `facility_head` | One facility, all aggregate ward analytics only |
 | `activities_lead` | One facility, resident list and aggregate reports |
 | `viewer` | One facility, aggregate reports only |
+| `ward_analytics` | One ward, aggregate interaction analytics only |
+
+`ward_analytics` is intended for a shared ward login. It provides counts and feature usage only; it cannot open resident records, device records, licences, or team access. Cloudflare Access authenticates the shared login email. The audit trail therefore records the ward account, not the individual staff member using it.
 
 ## TESS app contract
 

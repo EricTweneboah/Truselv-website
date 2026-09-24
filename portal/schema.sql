@@ -10,11 +10,22 @@ CREATE TABLE IF NOT EXISTS facilities (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS wards (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(facility_id, name)
+);
+CREATE INDEX IF NOT EXISTS wards_facility ON wards(facility_id, active);
+
 CREATE TABLE IF NOT EXISTS facility_users (
   id TEXT PRIMARY KEY,
   facility_id TEXT REFERENCES facilities(id) ON DELETE CASCADE,
+  ward_id TEXT REFERENCES wards(id) ON DELETE CASCADE,
   email TEXT NOT NULL COLLATE NOCASE,
-  role TEXT NOT NULL CHECK(role IN ('truselv_admin','facility_admin','activities_lead','viewer')),
+  role TEXT NOT NULL CHECK(role IN ('truselv_admin','facility_admin','facility_head','activities_lead','viewer','ward_analytics')),
   active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(facility_id, email)
@@ -34,6 +45,7 @@ CREATE TABLE IF NOT EXISTS licences (
 CREATE TABLE IF NOT EXISTS devices (
   id TEXT PRIMARY KEY,
   facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
+  ward_id TEXT NOT NULL REFERENCES wards(id) ON DELETE RESTRICT,
   licence_id TEXT REFERENCES licences(id) ON DELETE SET NULL,
   label TEXT NOT NULL,
   platform TEXT NOT NULL DEFAULT 'android',
@@ -48,6 +60,7 @@ CREATE INDEX IF NOT EXISTS devices_facility ON devices(facility_id);
 CREATE TABLE IF NOT EXISTS residents (
   id TEXT PRIMARY KEY,
   facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
+  ward_id TEXT REFERENCES wards(id) ON DELETE SET NULL,
   first_name_cipher TEXT NOT NULL,
   last_name_cipher TEXT NOT NULL,
   dob_cipher TEXT NOT NULL,
@@ -61,6 +74,7 @@ CREATE TABLE IF NOT EXISTS usage_events (
   id TEXT PRIMARY KEY,
   facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
   device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+  ward_id TEXT NOT NULL REFERENCES wards(id) ON DELETE RESTRICT,
   resident_id TEXT REFERENCES residents(id) ON DELETE SET NULL,
   feature TEXT NOT NULL,
   event_name TEXT NOT NULL,

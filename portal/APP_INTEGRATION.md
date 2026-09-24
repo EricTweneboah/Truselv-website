@@ -39,6 +39,8 @@ Send batches to `POST /api/device/events` after an activity finishes or every fe
 
 Retry safely with the same event ID after a network failure. The server ignores duplicate IDs. Queue events locally in encrypted storage and remove them after a successful response. Do not capture voice recordings, free text, conversation transcripts, contacts, medical notes, location, or advertising identifiers for this reporting service.
 
+The portal derives the facility and ward from the registered device. The app must never send a facility ID or ward ID as a user-controlled value. For aggregate-only wards, send `residentId: null`; the portal still records the interaction count and feature for that ward.
+
 ## 4. Resident selection
 
 Only show facility residents returned by a future resident-assignment endpoint when a member of staff selects the person. Do not infer identity through voice, face, or behaviour. The app should allow activities without a resident selection.
