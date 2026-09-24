@@ -9,7 +9,7 @@ try { if ((await lstat(output)).isSymbolicLink()) throw new Error('Output cannot
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
 const files=(await readdir(root)).filter(n=>/^[a-zA-Z0-9-]+\.html$/.test(n));
-files.push('robots.txt','sitemap.xml','_redirects','css/site.css','css/tess-spec.css','js/site.js','more/index.html','documents/Bedbord-solution.pdf','documents/TruSelv-Investor-ready.pdf');
+files.push('robots.txt','sitemap.xml','_redirects','css/site.css','css/tess-spec.css','css/facility.css','js/site.js','more/index.html','documents/Bedbord-solution.pdf','documents/TruSelv-Investor-ready.pdf');
 const allowed=/\.(?:svg|webp|png|jpg|jpeg|ico|woff2|mp4|pdf|txt)$/;
 for(const directory of ['assets','downloads']) {
   for(const entry of await readdir(join(root,directory),{withFileTypes:true})) {

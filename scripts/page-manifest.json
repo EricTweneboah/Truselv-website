@@ -47,6 +47,10 @@
     "title": "FAQs & product support",
     "description": "Answers to common Bedbord and TESS questions, plus practical routes for product support, accessibility and order help."
   },
+  "facility.html": {
+    "title": "TESS facility access",
+    "description": "Information for care homes using TESS, including facility onboarding, device and licence management, and responsible usage insight."
+  },
   "privacy.html": {
     "title": "Website privacy notice",
     "description": "How information is handled when you browse this website, enquire about a product or ask for help."
