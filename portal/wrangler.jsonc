@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "tess-facility-portal",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-24",
+  "workers_dev": false,
+  "assets": { "directory": "./public", "binding": "ASSETS", "html_handling": "drop-trailing-slash" },
+  "d1_databases": [{ "binding": "DB", "database_name": "tess-facility-portal", "database_id": "REPLACE_WITH_D1_DATABASE_ID" }],
+  "vars": { "ACCESS_HEADER": "Cf-Access-Authenticated-User-Email" }
+}
