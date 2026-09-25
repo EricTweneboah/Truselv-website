@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS wards (
   facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0,1)),
+  access_policy_id TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(facility_id, name)
 );

@@ -20,6 +20,8 @@
 		"database_id": "34ec4a0d-dc80-4f5e-a936-4fc1b651cb50"
 	}],
 	"vars": {
-		"ACCESS_HEADER": "Cf-Access-Authenticated-User-Email"
+		"ACCESS_HEADER": "Cf-Access-Authenticated-User-Email",
+		"CF_ACCOUNT_ID": "c545ce263e3eb6415163467980eca2d5",
+		"PORTAL_HOST": "portal.truselv.co.uk"
 	}
 }

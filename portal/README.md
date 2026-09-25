@@ -12,6 +12,16 @@ This is the separate service for `portal.truselv.co.uk`, `admin.truselv.co.uk`, 
 6. Protect both domains with Cloudflare Zero Trust Access. Require named work-email identities and MFA. The Worker trusts the Access identity header only after Access protects the route.
 7. Provision the first TruSelv administrator directly in D1. All other access is assigned through the admin workspace and the Cloudflare Access policy.
 
+## Admin-managed portal invitations
+
+To allow **Team access → Create secure invitation** to add a manager to Cloudflare Access automatically, create a restricted Cloudflare API token with only **Access: Apps and Policies — Edit** permission for this account. Store it only as the Worker secret `CF_ACCESS_API_TOKEN`:
+
+```powershell
+npx wrangler secret put CF_ACCESS_API_TOKEN
+```
+
+The Worker finds the Access application for `portal.truselv.co.uk` and creates an allow policy for the exact invited email address. Keep One-time PIN as the portal application's sole login method. Do not use a global API key.
+
 ## Upgrade: ward-scoped access
 
 For the deployed database, apply the ward migration once before deploying the updated Worker:
