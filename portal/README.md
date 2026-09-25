@@ -22,6 +22,15 @@ npx wrangler secret put CF_ACCESS_API_TOKEN
 
 The Worker finds the Access application for `portal.truselv.co.uk` and creates an allow policy for the exact invited email address. Keep One-time PIN as the portal application's sole login method. Do not use a global API key.
 
+To send the invitation automatically, set these additional Worker secrets using the existing verified Resend sender:
+
+```powershell
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put PORTAL_INVITE_FROM
+```
+
+`PORTAL_INVITE_FROM` must be a verified sender, for example `TruSelv <website@truselv.co.uk>`. If email delivery is not configured or Resend rejects it, access is still created and the admin portal displays a manual link instead of claiming that an email was sent.
+
 ## Upgrade: ward-scoped access
 
 For the deployed database, apply the ward migration once before deploying the updated Worker:
