@@ -1,6 +1,6 @@
 # TESS facility portal
 
-This is the separate, protected service for `portal.truselv.co.uk` and `admin.truselv.co.uk`. It is intentionally not part of the public marketing Worker.
+This is the separate service for `portal.truselv.co.uk`, `admin.truselv.co.uk`, and `device-api.truselv.co.uk`. The browser portals are protected by Cloudflare Access; the device API uses a unique device activation key and has no browser interface.
 
 ## Before first deployment
 

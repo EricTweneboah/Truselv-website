@@ -6,7 +6,8 @@
 	"workers_dev": false,
 	"routes": [
 		{ "pattern": "portal.truselv.co.uk", "custom_domain": true },
-		{ "pattern": "admin.truselv.co.uk", "custom_domain": true }
+		{ "pattern": "admin.truselv.co.uk", "custom_domain": true },
+		{ "pattern": "device-api.truselv.co.uk", "custom_domain": true }
 	],
 	"assets": {
 		"directory": "./public",

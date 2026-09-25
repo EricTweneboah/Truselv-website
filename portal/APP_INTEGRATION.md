@@ -8,11 +8,11 @@ Store the key using Android Keystore / encrypted storage. The app must use HTTPS
 
 ## 2. Activate and bootstrap the registered device
 
-Immediately after a staff member enters the one-time device key, call `POST https://portal.truselv.co.uk/api/device/activate`. The portal records the device as active. Do this only during an authorised setup.
+Immediately after a staff member enters the one-time device key, call `POST https://device-api.truselv.co.uk/api/device/activate`. The portal records the device as active. Do this only during an authorised setup. This dedicated hostname is only for token-protected device calls; browser staff use the Cloudflare-Access-protected portal hostname.
 
 Then call bootstrap at app launch:
 
-Call `GET https://portal.truselv.co.uk/api/device/bootstrap` with:
+Call `GET https://device-api.truselv.co.uk/api/device/bootstrap` with:
 
 ```http
 Authorization: Bearer <device-key>
@@ -22,7 +22,7 @@ If the response says `suspended`, `retired`, or the licence is not active, block
 
 ## 3. Send usage events
 
-Send batches to `POST /api/device/events` after an activity finishes or every few minutes. Use IDs, not resident names or dates of birth:
+Send batches to `POST https://device-api.truselv.co.uk/api/device/events` after an activity finishes or every few minutes. Use IDs, not resident names or dates of birth:
 
 ```json
 {
