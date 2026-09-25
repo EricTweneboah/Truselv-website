@@ -1,4 +1,5 @@
-const app=document.querySelector('#app'),error=document.querySelector('#error'),identity=document.querySelector('#identity');let me,facilityId,selectedFacilityName;
+const app=document.querySelector('#app'),error=document.querySelector('#error'),identity=document.querySelector('#identity'),brandSubtitle=document.querySelector('#brand-subtitle');let me,facilityId,selectedFacilityName;
+const isAdminHost=location.hostname==='admin.truselv.co.uk';if(isAdminHost){document.title='TruSelv Administration';brandSubtitle.textContent='TESS Administration';}
 const api=async(p,o={})=>{const r=await fetch('/api/'+p,{headers:{'Content-Type':'application/json',...(o.headers||{})},...o}),d=await r.json();if(!r.ok)throw Error(d.error||'Request failed.');return d};
 const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));const date=v=>v?new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(v)):'—';
 const manages=()=>['truselv_admin','facility_admin'].includes(me.role),canResidents=()=>['truselv_admin','facility_admin','activities_lead'].includes(me.role),query=()=>`facilityId=${encodeURIComponent(facilityId)}`;
