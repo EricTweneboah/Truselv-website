@@ -4,6 +4,10 @@
 	"main": "worker.mjs",
 	"compatibility_date": "2026-09-24",
 	"workers_dev": false,
+	"observability": {
+		"enabled": true,
+		"traces": { "enabled": true }
+	},
 	"routes": [
 		{ "pattern": "portal.truselv.co.uk", "custom_domain": true },
 		{ "pattern": "admin.truselv.co.uk", "custom_domain": true },
