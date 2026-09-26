@@ -24,7 +24,9 @@ If the response says `suspended`, `retired`, or the licence is not active, block
 
 Call `GET https://device-api.truselv.co.uk/api/device/context` with the device bearer key to load active residents assigned to the device ward and restore any active session.
 
-Start a session with `POST /api/device/sessions/start`, passing `mode` (`individual` or `group`) and `residentIds`. An individual session requires exactly one resident and a group requires at least two when the ward has registered residents. If the ward has no registered residents, an empty selection creates an anonymous session. End it with `POST /api/device/sessions/end` and its `sessionId`.
+Start a session with `POST /api/device/sessions/start`, passing `mode` (`individual` or `group`) and `residentIds`. An individual session requires exactly one resident and a group requires at least two when the ward has registered residents. If the ward has no registered residents, an empty selection creates an anonymous session.
+
+End it with `POST /api/device/sessions/end`, its `sessionId`, and one structured observation per participant. Each observation contains `residentId` (null for an anonymous session), `engagementLevel` (1–5), `wellbeingChange` (`improved`, `unchanged`, `declined`, or `not_observed`), and optional fixed `outcomeTags`. These are staff observations, not clinical measurements.
 
 ## 4. Send usage events
 

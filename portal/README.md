@@ -72,4 +72,6 @@ The app uses a registered device key with `Authorization: Bearer <device-key>`:
 - `POST /api/device/sessions/end` ends the active session.
 - `POST /api/device/events` accepts a bounded batch of privacy-minimised activity events.
 
+The dedicated analytics page uses the self-hosted Apache ECharts build and structured session observations. See `ANALYTICS_CQC.md` for evidence boundaries, CQC mapping, and scaling guidance.
+
 See `APP_INTEGRATION.md` for the exact integration work.
