@@ -35,6 +35,8 @@ def icon(name):
     return f'<span class="icon-wrap"><svg class="icon" viewBox="0 0 32 32" aria-hidden="true">{ICONS[name]}</svg></span>'
 
 def button(label, href, style=''):
+    if label == 'Facility login':
+        label, href = 'Facility portal', 'https://portal.truselv.co.uk'
     return f'<a class="btn {style}" href="{E(href)}">{label}</a>'
 
 def textlink(label, href):
