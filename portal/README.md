@@ -67,6 +67,9 @@ Every new device must be assigned to a ward. Existing unassigned devices should 
 The app uses a registered device key with `Authorization: Bearer <device-key>`:
 
 - `GET /api/device/bootstrap` returns the facility ID, device status and active licence.
+- `GET /api/device/context` returns the device ward's active residents and current activity session.
+- `POST /api/device/sessions/start` starts a validated individual, group, or anonymous session.
+- `POST /api/device/sessions/end` ends the active session.
 - `POST /api/device/events` accepts a bounded batch of privacy-minimised activity events.
 
 See `APP_INTEGRATION.md` for the exact integration work.

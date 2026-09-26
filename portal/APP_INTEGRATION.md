@@ -20,7 +20,13 @@ Authorization: Bearer <device-key>
 
 If the response says `suspended`, `retired`, or the licence is not active, block the facility-linked experience and show a local support message. Keep core offline-only activities separate from portal access decisions if that is part of the agreed service.
 
-## 3. Send usage events
+## 3. Start an activity session
+
+Call `GET https://device-api.truselv.co.uk/api/device/context` with the device bearer key to load active residents assigned to the device ward and restore any active session.
+
+Start a session with `POST /api/device/sessions/start`, passing `mode` (`individual` or `group`) and `residentIds`. An individual session requires exactly one resident and a group requires at least two when the ward has registered residents. If the ward has no registered residents, an empty selection creates an anonymous session. End it with `POST /api/device/sessions/end` and its `sessionId`.
+
+## 4. Send usage events
 
 Send batches to `POST https://device-api.truselv.co.uk/api/device/events` after an activity finishes or every few minutes. Use IDs, not resident names or dates of birth:
 
@@ -28,7 +34,7 @@ Send batches to `POST https://device-api.truselv.co.uk/api/device/events` after 
 {
   "events": [{
     "id": "uuid-generated-on-device",
-    "residentId": "portal-resident-uuid-or-null",
+    "sessionId": "active-session-uuid-or-null",
     "feature": "music",
     "eventName": "activity_completed",
     "durationSeconds": 420,
@@ -39,13 +45,13 @@ Send batches to `POST https://device-api.truselv.co.uk/api/device/events` after 
 
 Retry safely with the same event ID after a network failure. The server ignores duplicate IDs. Queue events locally in encrypted storage and remove them after a successful response. Do not capture voice recordings, free text, conversation transcripts, contacts, medical notes, location, or advertising identifiers for this reporting service.
 
-The portal derives the facility and ward from the registered device. The app must never send a facility ID or ward ID as a user-controlled value. For aggregate-only wards, send `residentId: null`; the portal still records the interaction count and feature for that ward.
+The portal derives the facility and ward from the registered device. The app must never send a facility ID or ward ID as a user-controlled value. The active session securely links an event to its selected residents; anonymous sessions retain only aggregate interaction data.
 
-## 4. Resident selection
+## 5. Resident selection
 
-Only show facility residents returned by a future resident-assignment endpoint when a member of staff selects the person. Do not infer identity through voice, face, or behaviour. The app should allow activities without a resident selection.
+Only show active facility residents returned by the device context endpoint. Do not infer identity through voice, face, or behaviour. The app allows activities without a named resident only when the ward has no registered residents.
 
-## 5. Security requirements
+## 6. Security requirements
 
 - Keep the device key in platform secure storage.
 - Never write the key or resident data to debug logs, analytics SDKs, crash reports or screenshots.

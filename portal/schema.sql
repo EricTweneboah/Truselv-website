@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS usage_events (
   device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
   ward_id TEXT NOT NULL REFERENCES wards(id) ON DELETE RESTRICT,
   resident_id TEXT REFERENCES residents(id) ON DELETE SET NULL,
+  session_id TEXT REFERENCES activity_sessions(id) ON DELETE SET NULL,
   feature TEXT NOT NULL,
   event_name TEXT NOT NULL,
   duration_seconds INTEGER CHECK(duration_seconds IS NULL OR duration_seconds >= 0),
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS usage_events (
 );
 CREATE INDEX IF NOT EXISTS usage_events_facility_date ON usage_events(facility_id, occurred_at);
 CREATE INDEX IF NOT EXISTS usage_events_feature ON usage_events(facility_id, feature, occurred_at);
+CREATE INDEX IF NOT EXISTS usage_events_session ON usage_events(session_id);
 
 CREATE TABLE IF NOT EXISTS audit_log (
   id TEXT PRIMARY KEY,
@@ -152,3 +154,25 @@ CREATE TABLE IF NOT EXISTS support_ticket_messages (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS support_ticket_messages_ticket ON support_ticket_messages(ticket_id, created_at);
+
+CREATE TABLE IF NOT EXISTS activity_sessions (
+  id TEXT PRIMARY KEY,
+  facility_id TEXT NOT NULL REFERENCES facilities(id) ON DELETE CASCADE,
+  device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+  ward_id TEXT NOT NULL REFERENCES wards(id) ON DELETE RESTRICT,
+  mode TEXT NOT NULL CHECK(mode IN ('individual','group')),
+  anonymous INTEGER NOT NULL DEFAULT 0 CHECK(anonymous IN (0,1)),
+  status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','ended')),
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS activity_sessions_facility_started ON activity_sessions(facility_id, started_at);
+CREATE INDEX IF NOT EXISTS activity_sessions_device_status ON activity_sessions(device_id, status);
+
+CREATE TABLE IF NOT EXISTS activity_session_residents (
+  session_id TEXT NOT NULL REFERENCES activity_sessions(id) ON DELETE CASCADE,
+  resident_id TEXT NOT NULL REFERENCES residents(id) ON DELETE CASCADE,
+  PRIMARY KEY(session_id, resident_id)
+);
+CREATE INDEX IF NOT EXISTS activity_session_residents_resident ON activity_session_residents(resident_id);
