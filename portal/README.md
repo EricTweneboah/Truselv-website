@@ -54,9 +54,9 @@ Every new device must be assigned to a ward. Existing unassigned devices should 
 | Role | Scope |
 |---|---|
 | `truselv_admin` | All facilities, onboarding, devices, licences and audit history |
-| `facility_admin` | One facility, people, residents, devices and reports |
-| `facility_head` | One facility, all aggregate ward analytics only |
-| `activities_lead` | One facility, resident list and aggregate reports |
+| `facility_admin` | One facility, wards, resident registration, people, devices and reports |
+| `facility_head` | One facility, wards, resident registration and reports |
+| `activities_lead` | One facility, activity and resident participation reports |
 | `viewer` | One facility, aggregate reports only |
 | `ward_analytics` | One ward, aggregate interaction analytics only |
 
@@ -73,5 +73,7 @@ The app uses a registered device key with `Authorization: Bearer <device-key>`:
 - `POST /api/device/events` accepts a bounded batch of privacy-minimised activity events.
 
 The dedicated analytics page uses the self-hosted Apache ECharts build and structured session observations. See `ANALYTICS_CQC.md` for evidence boundaries, CQC mapping, and scaling guidance.
+
+Resident bulk import uses the self-hosted ExcelJS browser build to generate and read the `.xlsx` template. The Worker validates every submitted row before creating encrypted resident records.
 
 See `APP_INTEGRATION.md` for the exact integration work.
