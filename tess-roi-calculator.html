@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TESS impact &amp; ROI calculator | TruSelv</title>
+<meta name="description" content="Model TESS participation, engagement capacity and facility-portal costs using your own assumptions.">
+<meta name="theme-color" content="#14283b">
+<link rel="canonical" href="https://truselv.co.uk/tess-roi-calculator">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TESS impact &amp; ROI calculator | TruSelv">
+<meta property="og:description" content="Model TESS participation, engagement capacity and facility-portal costs using your own assumptions.">
+<meta property="og:url" content="https://truselv.co.uk/tess-roi-calculator">
+<meta property="og:image" content="https://truselv.co.uk/assets/tess-care-session.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preload" href="assets/Manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "TruSelv", "url": "https://truselv.co.uk", "logo": "https://truselv.co.uk/assets/logo.svg", "email": "support@truselv.co.uk"}</script>
+<script src="js/site-config.js" defer>
+</script>
+<script src="js/site.js" defer>
+</script>
+<script src="js/tess-roi-calculator.js" defer></script>
+<noscript>
+<style>.menu-toggle,form[data-inquiry],#order-form,#review-order,.quantity button,.gallery-thumbs,.resource-tools,#roi-form,[data-cookie-settings],#video-toggle,#video-sound{display:none!important}@media(max-width:820px){.header-inner{height:auto;align-items:flex-start;flex-direction:column;padding-block:16px}.navigation{display:flex;position:static;max-height:none;padding:0;gap:14px;flex-wrap:wrap}.navigation>a{padding:5px}}</style>
+</noscript>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="container header-inner">
+<a class="logo" href="/" aria-label="TruSelv home">
+<img src="assets/logo.svg" width="164" height="57" alt="TruSelv">
+</a>
+<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">☰</span>
+</button>
+<nav class="navigation" id="navigation" aria-label="Main navigation">
+<details class="nav-products">
+<summary>Our products <span aria-hidden="true">⌄</span>
+</summary>
+<div class="product-menu">
+<a href="/bedbord">
+<strong>Bedbord</strong>
+<small>A clearer picture at the bedside.</small>
+</a>
+<a href="/tess">
+<strong>TESS</strong>
+<small>More moments that matter.</small>
+</a>
+<a href="/shop">
+<strong>Shop TESS</strong>
+<small>Explore the TESS tablet.</small>
+</a>
+</div>
+</details>
+<a href="/about">Our purpose</a>
+<a href="/resources">Resources</a>
+<a href="/trust">Trust centre</a>
+<a class="btn outline facility-login" href="https://portal.truselv.co.uk">Facility portal</a>
+<a class="btn " href="/book-demo">Book a demo</a>
+</nav>
+</div>
+</header>
+<main id="main" tabindex="-1"><section class="page-hero ivory">
+<div class="container">
+<p class="eyebrow">TESS impact &amp; ROI calculator</p>
+<h1>Participation.<br>Capacity. Insight.</h1>
+<p class="lead">Model the reach of TESS sessions, the activity capacity they support, and the cost of your facility portal.</p>
+</div>
+</section>
+<section class="section">
+<div class="container calculator">
+<div>
+<form id="tess-roi-form">
+<div class="calculator-inputs">
+<div class="field"><label for="devices">Active TESS tablets</label><input type="number" name="devices" id="devices" required min="1" max="10000" step="1" value="1"></div>
+<div class="field"><label for="sessions">Planned sessions per tablet / week</label><input type="number" name="sessions" id="sessions" required min="0" max="500" step="1" value="10"></div>
+<div class="field"><label for="minutes">Average session length (minutes)</label><input type="number" name="minutes" id="minutes" required min="1" max="480" step="1" value="30"></div>
+<div class="field"><label for="participants">Average participants per session</label><input type="number" name="participants" id="participants" required min="1" max="1000" step="0.5" value="2"></div>
+<div class="field"><label for="adminMinutes">Activity planning or administration saved (minutes / session)</label><input type="number" name="adminMinutes" id="adminMinutes" required min="0" max="240" step="0.5" value="5"></div>
+<div class="field"><label for="hourly">Staff cost (&pound; / hour)</label><input type="number" name="hourly" id="hourly" required min="0" max="500" step="0.5" value="25"></div>
+<div class="field"><label for="annual">Annual TESS, portal and analytics cost (&pound;)</label><input type="number" name="annual" id="annual" required min="0" max="10000000" step="1" value="0"></div>
+<div class="field"><label for="upfront">One-off onboarding cost (&pound;)</label><input type="number" name="upfront" id="upfront" required min="0" max="10000000" step="1" value="0"></div>
+</div>
+<p class="note">Use only locally validated time savings and quoted costs. Participation and engagement figures are service measures, not clinical or wellbeing outcomes.</p>
+<button class="btn outline" type="reset">Reset example</button>
+<p id="tess-roi-error" class="error-message" role="alert" hidden>Enter valid numbers within the displayed limits.</p>
+</form>
+</div>
+<div class="calculator-output" aria-live="polite" aria-atomic="true">
+<p class="eyebrow">Your annual model</p>
+<div class="calc-stat"><span>Participation opportunities</span><output class="number" id="tess-participation">1,040</output><small id="tess-participation-detail">Named or group places across planned sessions.</small></div>
+<div class="calc-stat"><span>Engagement hours</span><output class="number" id="tess-engagement">260 hours</output><small>Planned activity time; not a measure of wellbeing.</small></div>
+<div class="calc-stat"><span>Staff capacity released</span><output class="number" id="tess-capacity">43 hours</output><small id="tess-capacity-detail">From the entered planning or administration assumption.</small></div>
+<div class="calc-stat"><span>First-year net modelled value</span><output class="number" id="tess-net">Add costs</output><small id="tess-return">Enter your quoted costs to calculate ROI and payback.</small></div>
+<p class="small" id="tess-payback"></p>
+<button class="btn white" type="button" id="print-tess-roi">Print / save estimate as PDF</button>
+<p class="small">Illustrative only. Validate assumptions through a pilot. TESS analytics supports review and CQC evidence preparation; it does not diagnose, assess or guarantee outcomes.</p>
+</div>
+</div>
+</section>
+<section class="section ivory">
+<div class="container three-grid">
+<article class="feature"><span class="feature-number">01</span><h3>People</h3><p>Choice. Communication. Shared activity.</p></article>
+<article class="feature"><span class="feature-number">02</span><h3>Teams</h3><p>Planned sessions. Less administration. Clearer handovers.</p></article>
+<article class="feature"><span class="feature-number">03</span><h3>Services</h3><p>Facility portal. Participation records. CQC evidence support.</p></article>
+</div>
+</section>
+<section class="section">
+<div class="container narrow">
+<p class="eyebrow">How the model works</p>
+<h2>Transparent assumptions.</h2>
+<div class="document-body">
+<h3>Participation opportunities</h3><p>Active tablets &times; weekly sessions &times; 52 &times; average participants.</p>
+<h3>Engagement hours</h3><p>Active tablets &times; weekly sessions &times; 52 &times; average session length.</p>
+<h3>Capacity value</h3><p>Entered time saved &times; sessions &times; staff cost, less annual and one-off costs.</p>
+</div>
+</div>
+</section>
+<section class="section"><div class="container"><div class="cta dark"><div><p class="eyebrow">Use your own evidence</p><h2>Test it in your setting.</h2><p>Start with a facility setup, named sessions and a clear baseline.</p></div><a class="btn teal" href="/book-demo?product=TESS">Book a TESS demo</a></div></div></section></main>
+<footer class="site-footer">
+<div class="container">
+<div class="footer-top">
+<div class="footer-brand">
+<a href="/">
+<img src="assets/logo.svg" width="170" height="58" alt="TruSelv home" loading="lazy">
+</a>
+<p>The person beyond<br>the diagnosis.</p>
+</div>
+<div class="footer-column">
+<h2>Products</h2>
+<a href="/bedbord">Bedbord</a>
+<a href="/tess">TESS</a>
+<a href="/shop">Shop TESS</a>
+<a href="/roi-calculator">Time & ROI calculator</a>
+<a href="/tess#download">Get the TESS app</a>
+</div>
+<div class="footer-column">
+<h2>Explore</h2>
+<a href="/about">Our purpose</a>
+<a href="/team">Our team</a>
+<a href="/partnerships">Partnerships</a>
+<a href="/resources">Resources</a>
+<a href="/support">FAQs & support</a>
+<a href="/contact">Contact us</a>
+</div>
+<div class="footer-column">
+<h2>Trust & safety</h2>
+<a href="/trust">Trust centre</a>
+<a href="/safety">Product safety</a>
+<a href="/accessibility">Accessibility</a>
+<a href="/acceptable-use">Acceptable use</a>
+<a href="/book-demo">Book a demo</a>
+</div>
+<div class="footer-column">
+<h2>Legal</h2>
+<a href="/privacy">Privacy notice</a>
+<a href="/cookies">Cookie policy</a>
+<a href="/terms">Website terms</a>
+<a href="/sales-terms">Sales terms</a>
+<a href="/returns">Delivery & returns</a>
+<a href="/legal">Company information</a>
+<button type="button" data-cookie-settings>Cookie preferences</button>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2026 TruSelv. All rights reserved.</p>
+<a href="mailto:support@truselv.co.uk">support@truselv.co.uk</a>
+<span>Human-centred digital healthcare.</span>
+</div>
+</div>
+</footer>
+<dialog class="modal" id="cookie-dialog" aria-labelledby="cookie-title">
+<button class="modal-close" data-close-dialog aria-label="Close cookie preferences">×</button>
+<p class="eyebrow">Your privacy</p>
+<h2 id="cookie-title">A quieter kind of website.</h2>
+<p>This site uses no advertising cookies, analytics trackers or third-party video embeds. Fonts, images and videos are served with the site.</p>
+<div class="cookie-status">
+<span>Advertising & analytics</span>
+<span>Not used</span>
+</div>
+<p class="small" style="margin-top:20px">Forms and the basket stay in this page’s memory and are cleared when you leave or reload. Opening secure checkout loads Stripe’s payment form and necessary payment/fraud-prevention technology. Stripe’s privacy policy applies; see our cookie policy. App stores have their own policies.</p>
+<a href="/cookies" class="text-link">Read the cookie policy</a>
+<div class="actions">
+<button class="btn" data-close-dialog>Done</button>
+</div>
+</dialog>
+</body>
+</html>
