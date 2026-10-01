@@ -11,7 +11,7 @@
 <meta property="og:title" content="TESS — more moments that matter | TruSelv">
 <meta property="og:description" content="Explore the TESS tablet: communication, games, reminiscence, radio and entertainment. £119.">
 <meta property="og:url" content="https://truselv.co.uk/tess">
-<meta property="og:image" content="https://truselv.co.uk/assets/tess-care_home_lifestyle.webp">
+<meta property="og:image" content="https://truselv.co.uk/assets/tess-care-session.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.ico">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -22,6 +22,7 @@
 </script>
 <script src="js/site.js" defer>
 </script>
+<script src="js/tess-carousel.js" defer></script>
 <noscript>
 <style>.menu-toggle,form[data-inquiry],#order-form,#review-order,.quantity button,.gallery-thumbs,.resource-tools,#roi-form,[data-cookie-settings],#video-toggle,#video-sound{display:none!important}@media(max-width:820px){.header-inner{height:auto;align-items:flex-start;flex-direction:column;padding-block:16px}.navigation{display:flex;position:static;max-height:none;padding:0;gap:14px;flex-wrap:wrap}.navigation>a{padding:5px}}</style>
 </noscript>
@@ -76,15 +77,42 @@
 </div>
 </div>
 <div>
-<div class="product-video">
-<figure>
-<video controls playsinline preload="metadata" poster="assets/tess-poster.webp" aria-label="Meet TESS">
-<source src="assets/tess.mp4" type="video/mp4">
-<p>Your browser cannot play this video. <a href="assets/tess.mp4">Download the video</a>.</p>
-</video>
-<figcaption>Meet TESS · Illustrative product film</figcaption>
+<section class="tess-carousel" aria-label="TESS in use across care settings" aria-roledescription="carousel" data-tess-carousel>
+<div class="tess-carousel-viewport">
+<figure class="tess-carousel-slide is-active" data-carousel-slide>
+<img src="assets/tess-care-session.webp" alt="An older person and care worker using TESS together in a care home" width="1448" height="1086" fetchpriority="high">
+<figcaption>Meaningful moments, supported by the people who know each person best.</figcaption>
+</figure>
+<figure class="tess-carousel-slide" data-carousel-slide hidden>
+<img src="assets/tess-care-bedside.webp" alt="A hospital patient using the TESS communication screen from their bedside" width="1536" height="1024" loading="lazy">
+<figcaption>Communication tools designed for supported use.</figcaption>
+</figure>
+<figure class="tess-carousel-slide" data-carousel-slide hidden>
+<img src="assets/tess-care-game.webp" alt="A patient and nurse sharing a game on TESS" width="1536" height="1024" loading="lazy">
+<figcaption>Games and familiar activities can create a shared starting point.</figcaption>
+</figure>
+<figure class="tess-carousel-slide" data-carousel-slide hidden>
+<img src="assets/tess-care-team.webp" alt="Two care team members with a TESS screen showing British Sign Language" width="1538" height="1023" loading="lazy">
+<figcaption>Accessible ways to communicate and take part.</figcaption>
+</figure>
+<figure class="tess-carousel-slide" data-carousel-slide hidden>
+<img src="assets/tess-care-ward.webp" alt="Care team members standing beside a TESS screen in a ward" width="1448" height="1086" loading="lazy">
+<figcaption>TESS can sit alongside everyday care and activity support.</figcaption>
 </figure>
 </div>
+<div class="tess-carousel-controls" data-carousel-controls hidden>
+<button type="button" class="tess-carousel-button" data-carousel-previous aria-label="Show previous image">Previous</button>
+<p class="tess-carousel-status" aria-live="polite" data-carousel-status>Image 1 of 5</p>
+<button type="button" class="tess-carousel-button" data-carousel-next aria-label="Show next image">Next</button>
+</div>
+<div class="tess-carousel-dots" aria-label="Choose an image" role="group" data-carousel-dots hidden>
+<button type="button" class="is-active" data-carousel-dot aria-label="Show image 1" aria-current="true"></button>
+<button type="button" data-carousel-dot aria-label="Show image 2"></button>
+<button type="button" data-carousel-dot aria-label="Show image 3"></button>
+<button type="button" data-carousel-dot aria-label="Show image 4"></button>
+<button type="button" data-carousel-dot aria-label="Show image 5"></button>
+</div>
+</section>
 <div class="under-video">
 <p>See what this could look like in your care setting.</p>
 <a class="btn teal" href="/book-demo?product=TESS">Book a demo</a>
@@ -112,7 +140,7 @@
 <p>Choose touch, a keyboard, a mouse or a stylus to find a comfortable way to take part, using compatible accessories.</p>
 </div>
 <div>
-<img class="split-image" src="assets/tess-interaction_closeup.webp" alt="An older adult pointing at a TESS tablet with a care worker alongside" width="700" height="700" loading="lazy">
+<img class="split-image" src="assets/tess-care-game.webp" alt="A patient and nurse sharing a game on a TESS screen" width="1536" height="1024" loading="lazy">
 <p class="photo-note">Illustrative care-setting imagery.</p>
 </div>
 </div>
@@ -194,7 +222,7 @@
 </section>
 <section class="section" id="tablet">
 <div class="container split">
-<img class="split-image" src="assets/tess-angled_bundle.webp" alt="TESS tablet displayed at an angle with keyboard, mouse and stylus" width="720" height="720" loading="lazy">
+<img class="split-image" src="assets/tess-care-team.webp" alt="Care team members using a TESS screen to support communication" width="720" height="720" loading="lazy">
 <div>
 <p class="eyebrow">A simple way to get started</p>
 <h2>Your TESS tablet.<br>More ways to connect.</h2>
