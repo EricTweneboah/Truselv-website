@@ -11,7 +11,7 @@
 <meta property="og:title" content="The person beyond the diagnosis | TruSelv">
 <meta property="og:description" content="Meet Bedbord and TESS: digital bedside information and meaningful engagement, designed around the person receiving care.">
 <meta property="og:url" content="https://truselv.co.uk/">
-<meta property="og:image" content="https://truselv.co.uk/assets/tess-care_home_lifestyle.webp">
+<meta property="og:image" content="https://truselv.co.uk/assets/tess-care-session.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.ico">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -22,6 +22,7 @@
 </script>
 <script src="js/site.js" defer>
 </script>
+<script src="js/tess-home-carousel.js" defer></script>
 <noscript>
 <style>.menu-toggle,form[data-inquiry],#order-form,#review-order,.quantity button,.gallery-thumbs,.resource-tools,#roi-form,[data-cookie-settings],#video-toggle,#video-sound{display:none!important}@media(max-width:820px){.header-inner{height:auto;align-items:flex-start;flex-direction:column;padding-block:16px}.navigation{display:flex;position:static;max-height:none;padding:0;gap:14px;flex-wrap:wrap}.navigation>a{padding:5px}}</style>
 </noscript>
@@ -190,7 +191,28 @@
 </section>
 <section class="section mint">
 <div class="container split">
-<img class="split-image" src="assets/tess-care_home_lifestyle.webp" alt="An older woman and a care worker sharing an activity on a TESS tablet" width="720" height="890" loading="lazy">
+<section class="home-tess-carousel" aria-label="TESS in care settings" aria-roledescription="carousel" data-home-tess-carousel>
+<figure class="home-tess-carousel-slide is-active" data-home-tess-slide>
+<img src="assets/tess-care-session.webp" alt="An older person and care worker using TESS together in a care home" width="1448" height="1086" loading="lazy">
+</figure>
+<figure class="home-tess-carousel-slide" data-home-tess-slide hidden>
+<img src="assets/tess-care-bedside.webp" alt="A hospital patient using the TESS communication screen from their bedside" width="1536" height="1024" loading="lazy">
+</figure>
+<figure class="home-tess-carousel-slide" data-home-tess-slide hidden>
+<img src="assets/tess-care-game.webp" alt="A patient and nurse sharing a game on TESS" width="1536" height="1024" loading="lazy">
+</figure>
+<figure class="home-tess-carousel-slide" data-home-tess-slide hidden>
+<img src="assets/tess-care-team.webp" alt="Two care team members with a TESS screen showing British Sign Language" width="1538" height="1023" loading="lazy">
+</figure>
+<figure class="home-tess-carousel-slide" data-home-tess-slide hidden>
+<img src="assets/tess-care-ward.webp" alt="Care team members standing beside a TESS screen in a ward" width="1448" height="1086" loading="lazy">
+</figure>
+<div class="home-tess-carousel-controls" data-home-tess-controls hidden>
+<button type="button" data-home-tess-previous aria-label="Show previous TESS image">Previous</button>
+<p aria-live="polite" data-home-tess-status>Image 1 of 5</p>
+<button type="button" data-home-tess-next aria-label="Show next TESS image">Next</button>
+</div>
+</section>
 <div>
 <p class="eyebrow">Meet TESS</p>
 <h2>Little moments.<br>Lasting meaning.</h2>
