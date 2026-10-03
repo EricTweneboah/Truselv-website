@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { createHandler, validateInquiry, checkoutReady } from '../server.mjs';
+import {validWorkEmail, validateResourceLead} from '../resource-access.mjs';
 
 const base = JSON.parse(await readFile(new URL('../site.config.json', import.meta.url), 'utf8'));
 const ready = { ...base, salesReady: true, legalName: 'Test seller', companyNumber: '12345678', registeredOffice: 'Test address' };
@@ -44,6 +45,25 @@ test('Resend demo uses fixed support recipient and visitor Reply-To', async t =>
   });
   const data = {kind:'demo',name:'Test Visitor',email:'visitor@example.com',organisation:'Example care',role:'Manager',product:'Bedbord',message:'Please arrange a product demonstration.',privacy:'on',to:'attacker@example.com'};
   assert.deepEqual(await (await api.post('/api/inquiries',data)).json(),{accepted:true});
+});
+test('resource access rejects personal email domains and issues a signed access cookie for work email', async t => {
+  assert.equal(validWorkEmail('person@gmail.com'),false);
+  assert.equal(validWorkEmail('manager@carehome.example'),true);
+  const lead={resource:'tess-product-brief.pdf',firstName:'Test',lastName:'Manager',email:'manager@carehome.example',organisation:'Example Care',postcode:'BS1 1AA',privacy:'on'};
+  assert.equal(validateResourceLead(lead),null);
+  assert.match(validateResourceLead({...lead,email:'person@outlook.com'}),/work email/);
+  const api=await fixture(t,base,{RESEND_API_KEY:'secret-email-key',INQUIRY_FROM:'website@truselv.co.uk',RESOURCE_ACCESS_SECRET:'test-resource-secret'},async(url,options)=>{
+    assert.equal(url,'https://api.resend.com/emails');
+    const email=JSON.parse(options.body);
+    assert.deepEqual(email.to,['support@truselv.co.uk']);
+    assert.equal(email.reply_to,'manager@carehome.example');
+    assert.match(email.text,/Marketing consent: No/);
+    return new Response(JSON.stringify({id:'accepted-resource-lead'}));
+  });
+  const response=await api.post('/api/resource-access',lead);
+  assert.equal(response.status,200);
+  assert.match(response.headers.get('set-cookie'),/^truselv_resource_access=v1\./);
+  assert.deepEqual(await response.json(),{accepted:true,downloadUrl:'/downloads/tess-product-brief.pdf'});
 });
 test('cross-origin requests, invalid quantities and unacknowledged terms are rejected', async t => {
   const api = await fixture(t, ready, enabledEnv);

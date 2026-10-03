@@ -75,6 +75,67 @@
   }));
   $('#resource-search')?.addEventListener('input', filterResources);
 
+  const resourceDialog = $('#resource-access-dialog');
+  const resourceForm = $('#resource-access-form');
+  const personalEmailDomains = new Set(['gmail.com','googlemail.com','outlook.com','hotmail.com','live.com','msn.com','yahoo.com','yahoo.co.uk','ymail.com','rocketmail.com','icloud.com','me.com','mac.com','aol.com','proton.me','protonmail.com','gmx.com','gmx.co.uk','mail.com','zoho.com','yandex.com','yandex.ru']);
+  const openResourceForm = resource => {
+    if (!resourceDialog || !resourceForm) return;
+    resourceForm.resource.value = resource;
+    $('.error-message', resourceForm).hidden = true;
+    resourceDialog.showModal();
+    resourceForm.firstName.focus();
+  };
+  $$('[data-resource-download]').forEach(link => link.addEventListener('click', async event => {
+    if (!config.resourceAccessEndpoint) return;
+    event.preventDefault();
+    try {
+      const response = await fetch(config.resourceAccessEndpoint, {headers:{Accept:'application/json'}, signal:AbortSignal.timeout(5000)});
+      const status = await response.json();
+      if (response.ok && status.allowed === true) location.assign(link.href);
+      else openResourceForm(link.dataset.resourceDownload);
+    } catch { openResourceForm(link.dataset.resourceDownload); }
+  }));
+  $('[data-close-resource-dialog]')?.addEventListener('click', () => resourceDialog.close());
+  resourceDialog?.addEventListener('click', event => {
+    if (event.target !== resourceDialog) return;
+    const rect = resourceDialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) resourceDialog.close();
+  });
+  if (resourceForm) {
+    const requestedResource = params.get('access') === 'required' ? params.get('download') : '';
+    if (requestedResource && $$('[data-resource-download]').some(link => link.dataset.resourceDownload === requestedResource)) openResourceForm(requestedResource);
+    resourceForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!resourceForm.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(resourceForm));
+      if (data.website) return;
+      const email = data.email.trim().toLowerCase();
+      const emailDomain = email.split('@').pop();
+      const error = $('.error-message', resourceForm);
+      if (personalEmailDomains.has(emailDomain)) {
+        error.hidden = false;
+        error.textContent = 'Enter your work email address. Personal email services such as Gmail, Outlook and Yahoo cannot be used.';
+        resourceForm.email.focus();
+        return;
+      }
+      const submit = $('button[type="submit"]', resourceForm);
+      error.hidden = true;
+      submit.disabled = true;
+      submit.textContent = 'Preparing download…';
+      try {
+        const response = await fetch(config.resourceAccessEndpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), signal:AbortSignal.timeout(15000)});
+        const result = await response.json();
+        if (!response.ok || !result.downloadUrl) throw new Error(result.error || 'The download could not be prepared. Please try again.');
+        location.assign(result.downloadUrl);
+      } catch (exception) {
+        error.hidden = false;
+        error.textContent = exception.name === 'TimeoutError' ? 'The request timed out. Please try again.' : exception.message;
+        submit.disabled = false;
+        submit.textContent = 'Continue to download';
+      }
+    });
+  }
+
   function setOption(select, value) {
     if (!select || !value) return;
     const option = [...select.options].find(o => o.value.toLowerCase() === value.toLowerCase());

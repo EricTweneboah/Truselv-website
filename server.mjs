@@ -5,6 +5,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import { createApi, publicConfig as getPublicConfig } from './api.mjs';
+import {GATED_RESOURCES, hasResourceAccess} from './resource-access.mjs';
 export { validateInquiry, validEmail, checkoutReady, SHIPPING_COUNTRIES } from './api.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -39,6 +40,18 @@ export function createHandler({ config, env = process.env, fetcher = fetch, root
       }
       let pathname;
       try { pathname = decodeURIComponent(url.pathname); } catch { return json(res, 400, { error: 'Invalid URL.' }); }
+      const resourceName = pathname.startsWith('/downloads/') ? pathname.slice('/downloads/'.length) : '';
+      if (GATED_RESOURCES.has(resourceName)) {
+        const accessRequest = new Request(url, {headers:req.headers});
+        if (!await hasResourceAccess(accessRequest, env.RESOURCE_ACCESS_SECRET)) {
+          const location = new URL('/resources', siteUrl);
+          location.searchParams.set('download', resourceName);
+          location.searchParams.set('access', 'required');
+          location.hash = 'resource-access';
+          res.writeHead(302, {Location:location.pathname + location.search + location.hash});
+          return res.end();
+        }
+      }
       if (pathname.endsWith('.html')) {
         const name=pathname.slice(1,-5);
         if (!['care','home-improvements','careers','folda','ngage','teevy','documentation','compliance-blog','edi-blog','innovation-blog','Partnership'].includes(name)) {

@@ -20,6 +20,12 @@ test('Worker checks origin, validates shipping and uses Cloudflare rate limiter'
   assert.equal((await worker.fetch(req('https://preview.workers.dev'),env)).status,422);
   assert.equal((await worker.fetch(req('https://preview.workers.dev'),env)).status,429);
 });
+test('Worker redirects protected resources to the work-email access form',async()=>{
+  const env={RESOURCE_ACCESS_SECRET:'test-resource-secret'};
+  const response=await worker.fetch(new Request('https://preview.workers.dev/downloads/tess-product-brief.pdf'),env);
+  assert.equal(response.status,302);
+  assert.equal(response.headers.get('location'),'https://preview.workers.dev/resources?download=tess-product-brief.pdf&access=required#resource-access');
+});
 test('public deployment folder excludes credentials and application source',async()=>{
   const files=await readdir(new URL('../.cloudflare-public/',import.meta.url),{recursive:true});
   for(const file of files) assert.doesNotMatch(file,/(^|[\\/])(?:\.env|\.dev.vars|node_modules|site.config.json|server.mjs|api.mjs|worker.mjs|LAUNCH.md|tests|scripts)([\\/]|$)/);

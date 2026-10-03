@@ -10,7 +10,7 @@
     "binding": "ASSETS",
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*", "/js/site-config.js"]
+    "run_worker_first": ["/api/*", "/downloads/*", "/js/site-config.js"]
   },
   "ratelimits": [{
     "name": "API_RATE_LIMITER",

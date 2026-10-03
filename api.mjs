@@ -1,4 +1,5 @@
 import {orderWebhook} from './order-emails.mjs';
+import {createResourceAccessToken, hasResourceAccess, validateResourceLead} from './resource-access.mjs';
 export const SHIPPING_COUNTRIES = ['GB'];
 const STRIPE_VERSION = '2026-08-26.dahlia; custom_checkout_payment_form_preview=v1';
 export function validateInquiry(data) {
@@ -40,14 +41,14 @@ async function bodyJSON(request) {
 }
 export function publicConfig(config, env) {
   const enabled = checkoutReady(config, env);
-  return {...config, inquiryEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM ? '/api/inquiries' : '', checkoutEndpoint: enabled ? '/api/checkout' : '', orderStatusEndpoint: enabled ? '/api/order-status' : '', stripePublishableKey: enabled ? env.STRIPE_PUBLISHABLE_KEY : '', checkoutTestMode: enabled && env.STRIPE_SECRET_KEY.startsWith('sk_test_'), shippingCountries: SHIPPING_COUNTRIES};
+  return {...config, inquiryEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM ? '/api/inquiries' : '', resourceAccessEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM && env.RESOURCE_ACCESS_SECRET ? '/api/resource-access' : '', checkoutEndpoint: enabled ? '/api/checkout' : '', orderStatusEndpoint: enabled ? '/api/order-status' : '', stripePublishableKey: enabled ? env.STRIPE_PUBLISHABLE_KEY : '', checkoutTestMode: enabled && env.STRIPE_SECRET_KEY.startsWith('sk_test_'), shippingCountries: SHIPPING_COUNTRIES};
 }
 export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
   const limits = new Map();
   const siteUrl = new URL(env.SITE_URL || config.siteUrl).origin;
   const inquiriesEnabled = Boolean(env.RESEND_API_KEY && env.INQUIRY_FROM);
   const paymentsEnabled = checkoutReady(config, env);
-  function json(status, data) { return Response.json(data, {status, headers:{'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff', 'Referrer-Policy':'no-referrer'}}); }
+  function json(status, data, headers = {}) { return Response.json(data, {status, headers:{'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff', 'Referrer-Policy':'no-referrer', ...headers}}); }
   async function stripe(path, options = {}) {
     const response = await fetcher('https://api.stripe.com/v1/' + path, {...options, headers:{Authorization:`Bearer ${env.STRIPE_SECRET_KEY}`, 'Stripe-Version':STRIPE_VERSION, ...(options.headers || {})}, signal:AbortSignal.timeout(15000)});
     if (!response.ok) throw Object.assign(new Error('Payment service unavailable. Please try again or contact TruSelv.'), {status:502});
@@ -88,6 +89,30 @@ export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
           const sent = await response.json();
           if (!sent.id) return json(502, { error: 'Delivery could not be confirmed.' });
           return json(200, { accepted: true });
+        }
+        if (url.pathname === '/api/resource-access' && request.method === 'GET') {
+          return json(200, {allowed:await hasResourceAccess(request, env.RESOURCE_ACCESS_SECRET)});
+        }
+        if (url.pathname === '/api/resource-access' && request.method === 'POST') {
+          if (!inquiriesEnabled || !env.RESOURCE_ACCESS_SECRET) return json(503, {error:'Resource downloads are temporarily unavailable. Please contact TruSelv.'});
+          const data = await bodyJSON(request);
+          const invalid = validateResourceLead(data);
+          if (invalid) return json(422, {error:invalid});
+          const lead = [
+            `Resource: ${data.resource}`,
+            `Name: ${data.firstName.trim()} ${data.lastName.trim()}`,
+            `Work email: ${data.email.trim().toLowerCase()}`,
+            `Organisation: ${data.organisation.trim()}`,
+            `Organisation postcode: ${data.postcode?.trim() || 'Not provided'}`,
+            `Marketing consent: ${['on', true].includes(data.marketing) ? 'Yes' : 'No'}`
+          ].join('\n\n');
+          const response = await fetcher('https://api.resend.com/emails', {
+            method:'POST', headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`, 'Content-Type':'application/json'},
+            body:JSON.stringify({from:env.INQUIRY_FROM, to:['support@truselv.co.uk'], reply_to:data.email.trim().toLowerCase(), subject:`TruSelv resource download: ${data.resource}`, text:lead}), signal:AbortSignal.timeout(15000)
+          });
+          if (!response.ok || !(await response.json()).id) return json(502, {error:'We could not prepare the download. Please try again or contact TruSelv.'});
+          const token = await createResourceAccessToken(env.RESOURCE_ACCESS_SECRET);
+          return json(200, {accepted:true, downloadUrl:`/downloads/${data.resource}`}, {'Set-Cookie':`truselv_resource_access=${token}; Max-Age=86400; Path=/downloads/; Secure; HttpOnly; SameSite=Lax`});
         }
         if (url.pathname === '/api/checkout' && request.method === 'POST') {
           if (!paymentsEnabled) return json(503, { error: 'Checkout is not available yet. Please send an order enquiry.' });

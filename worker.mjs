@@ -1,11 +1,20 @@
 import config from './site.config.json' with { type: 'json' };
 import { createApi, publicConfig } from './api.mjs';
+import {GATED_RESOURCES, hasResourceAccess} from './resource-access.mjs';
 
 // Static files are served by Cloudflare Assets; only these dynamic paths invoke JS.
 const handlers = new WeakMap();
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const resourceName = url.pathname.startsWith('/downloads/') ? url.pathname.slice('/downloads/'.length) : '';
+    if (GATED_RESOURCES.has(resourceName) && ['GET', 'HEAD'].includes(request.method) && !await hasResourceAccess(request, env.RESOURCE_ACCESS_SECRET)) {
+      const location = new URL('/resources', url.origin);
+      location.searchParams.set('download', resourceName);
+      location.searchParams.set('access', 'required');
+      location.hash = 'resource-access';
+      return Response.redirect(location, 302);
+    }
     if (url.pathname === '/js/site-config.js') {
       if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, {status:405});
       return new Response(request.method === 'HEAD' ? null : 'window.TRUSELV_CONFIG = ' + JSON.stringify(publicConfig(config,env)) + ';', {
