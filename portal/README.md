@@ -27,9 +27,13 @@ To send the invitation automatically, set these additional Worker secrets using 
 ```powershell
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put PORTAL_INVITE_FROM
+npx wrangler secret put RESEND_MARKETING_SEGMENT_ID
+npx wrangler secret put MARKETING_FROM
 ```
 
 `PORTAL_INVITE_FROM` must be a verified sender, for example `TruSelv <website@truselv.co.uk>`. If email delivery is not configured or Resend rejects it, access is still created and the admin portal displays a manual link instead of claiming that an email was sent.
+
+`RESEND_MARKETING_SEGMENT_ID` connects the website consent form and the admin **Marketing updates** page to the same Resend segment. Set the same value on the website Worker. `MARKETING_FROM` must be a verified sender such as `TruSelv updates <updates@truselv.co.uk>`. Only TruSelv administrators can list contacts, send tests, save drafts, or schedule and send broadcasts. Resend supplies the unsubscribe link and suppresses contacts who opt out.
 
 ## Upgrade: ward-scoped access
 

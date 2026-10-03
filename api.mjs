@@ -111,6 +111,20 @@ export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
             body:JSON.stringify({from:env.INQUIRY_FROM, to:['support@truselv.co.uk'], reply_to:data.email.trim().toLowerCase(), subject:`TruSelv resource download: ${data.resource}`, text:lead}), signal:AbortSignal.timeout(15000)
           });
           if (!response.ok || !(await response.json()).id) return json(502, {error:'We could not prepare the download. Please try again or contact TruSelv.'});
+          if (['on', true].includes(data.marketing)) {
+            let segmentId=env.RESEND_MARKETING_SEGMENT_ID;
+            if(!segmentId){const segmentsResponse=await fetcher('https://api.resend.com/segments?limit=100',{headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`},signal:AbortSignal.timeout(15000)}),segments=segmentsResponse.ok?await segmentsResponse.json():null;segmentId=segments?.data?.find(x=>x.name==='TruSelv Updates')?.id;if(!segmentId&&segmentsResponse.ok){const createdResponse=await fetcher('https://api.resend.com/segments',{method:'POST',headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({name:'TruSelv Updates'}),signal:AbortSignal.timeout(15000)});if(createdResponse.ok)segmentId=(await createdResponse.json()).id;}}
+            const contact = {email:data.email.trim().toLowerCase(),first_name:data.firstName.trim(),last_name:data.lastName.trim(),unsubscribed:false};
+            const contactResponse = segmentId&&await fetcher('https://api.resend.com/contacts', {
+              method:'POST', headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`, 'Content-Type':'application/json'},
+              body:JSON.stringify(contact), signal:AbortSignal.timeout(15000)
+            });
+            if (contactResponse&&(contactResponse.ok || contactResponse.status===409)) {
+              if (contactResponse.status===409) await fetcher(`https://api.resend.com/contacts/${encodeURIComponent(contact.email)}`,{method:'PATCH',headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({first_name:contact.first_name,last_name:contact.last_name,unsubscribed:false}),signal:AbortSignal.timeout(15000)});
+              await fetcher(`https://api.resend.com/contacts/${encodeURIComponent(contact.email)}/segments/${encodeURIComponent(segmentId)}`,{method:'POST',headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+            }
+            // The support notification above remains the consent audit fallback if contact enrolment is unavailable.
+          }
           const token = await createResourceAccessToken(env.RESOURCE_ACCESS_SECRET);
           return json(200, {accepted:true, downloadUrl:`/downloads/${data.resource}`}, {'Set-Cookie':`truselv_resource_access=${token}; Max-Age=86400; Path=/downloads/; Secure; HttpOnly; SameSite=Lax`});
         }

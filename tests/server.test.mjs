@@ -65,6 +65,18 @@ test('resource access rejects personal email domains and issues a signed access 
   assert.match(response.headers.get('set-cookie'),/^truselv_resource_access=v1\./);
   assert.deepEqual(await response.json(),{accepted:true,downloadUrl:'/downloads/tess-product-brief.pdf'});
 });
+test('resource marketing consent enrols the work contact in the configured Resend segment', async t => {
+  const calls=[];
+  const api=await fixture(t,base,{RESEND_API_KEY:'secret-email-key',INQUIRY_FROM:'website@truselv.co.uk',RESOURCE_ACCESS_SECRET:'test-resource-secret',RESEND_MARKETING_SEGMENT_ID:'segment-123'},async(url,options)=>{
+    calls.push([url,options]);
+    return new Response(JSON.stringify({id:'accepted'}),{status:url.endsWith('/contacts')?201:200});
+  });
+  const response=await api.post('/api/resource-access',{resource:'tess-product-brief.pdf',firstName:'Test',lastName:'Manager',email:'manager@carehome.example',organisation:'Example Care',privacy:'on',marketing:'on'});
+  assert.equal(response.status,200);
+  assert.equal(calls[1][0],'https://api.resend.com/contacts');
+  assert.deepEqual(JSON.parse(calls[1][1].body),{email:'manager@carehome.example',first_name:'Test',last_name:'Manager',unsubscribed:false});
+  assert.equal(calls[2][0],'https://api.resend.com/contacts/manager%40carehome.example/segments/segment-123');
+});
 test('cross-origin requests, invalid quantities and unacknowledged terms are rejected', async t => {
   const api = await fixture(t, ready, enabledEnv);
   assert.equal((await api.post('/api/checkout', {}, 'https://other.example')).status, 403);
