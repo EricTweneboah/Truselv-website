@@ -74,6 +74,49 @@
     filterResources();
   }));
   $('#resource-search')?.addEventListener('input', filterResources);
+  if ($('.resource-grid')) {
+    const status = document.createElement('p');
+    status.className = 'small';
+    status.setAttribute('role', 'status');
+    $('.resource-grid').before(status);
+    const loadResources = async () => {
+      status.textContent = 'Loading additional resources?';
+      try {
+        const response = await fetch('/api/resources');
+        if (!response.ok) throw new Error('Resources unavailable');
+        const data = await response.json();
+        for (const resource of data.resources) {
+          const card = document.createElement('article');
+          card.className = 'resource-card'; card.dataset.category = resource.category;
+          card.id = `resource-${resource.id}`;
+          const pill = document.createElement('span'); pill.className = 'pill';
+          pill.textContent = `${resource.category} ? ${resource.file ? 'Document' : 'Article'}`;
+          const title = document.createElement('h2'); title.textContent = resource.title;
+          const summary = document.createElement('p'); summary.textContent = resource.summary;
+          card.append(pill, title, summary);
+          if (resource.body) {
+            const details = document.createElement('details'), toggle = document.createElement('summary'), text = document.createElement('div');
+            toggle.textContent = 'Read article'; toggle.setAttribute('aria-label', `Read article: ${resource.title}`);
+            text.textContent = resource.body; text.style.whiteSpace = 'pre-wrap'; text.style.overflowWrap = 'anywhere';
+            details.append(toggle, text); card.append(details);
+          }
+          if (resource.file) {
+            const link = document.createElement('a'); link.className = 'text-link';
+            link.href = resource.file.url; link.textContent = `Download ${resource.file.name}`;
+            link.style.overflowWrap = 'anywhere'; card.append(link);
+          }
+          $('.resource-grid').append(card);
+        }
+        status.textContent = ''; filterResources();
+      } catch {
+        status.textContent = 'Additional resources could not load. ';
+        const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'filter'; retry.textContent = 'Try again';
+        retry.onclick = loadResources; status.append(retry);
+      }
+    };
+    loadResources();
+  }
+
 
   const resourceDialog = $('#resource-access-dialog');
   const resourceForm = $('#resource-access-form');

@@ -1,31 +1,55 @@
 {
-	"$schema": "../node_modules/wrangler/config-schema.json",
-	"name": "tess-facility-portal",
-	"main": "worker.mjs",
-	"compatibility_date": "2026-09-24",
-	"workers_dev": false,
-	"observability": {
-		"enabled": true,
-		"traces": { "enabled": true }
-	},
-	"routes": [
-		{ "pattern": "portal.truselv.co.uk", "custom_domain": true },
-		{ "pattern": "admin.truselv.co.uk", "custom_domain": true },
-		{ "pattern": "device-api.truselv.co.uk", "custom_domain": true }
-	],
-	"assets": {
-		"directory": "./public",
-		"binding": "ASSETS",
-		"html_handling": "drop-trailing-slash"
-	},
-	"d1_databases": [{
-		"binding": "DB",
-		"database_name": "tess-facility-portal",
-		"database_id": "34ec4a0d-dc80-4f5e-a936-4fc1b651cb50"
-	}],
-	"vars": {
-		"ACCESS_HEADER": "Cf-Access-Authenticated-User-Email",
-		"CF_ACCOUNT_ID": "c545ce263e3eb6415163467980eca2d5",
-		"PORTAL_HOST": "portal.truselv.co.uk"
-	}
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "tess-facility-portal",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-24",
+  "workers_dev": false,
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true
+    }
+  },
+  "routes": [
+    {
+      "pattern": "portal.truselv.co.uk",
+      "custom_domain": true
+    },
+    {
+      "pattern": "admin.truselv.co.uk",
+      "custom_domain": true
+    },
+    {
+      "pattern": "device-api.truselv.co.uk",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "drop-trailing-slash"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tess-facility-portal",
+      "database_id": "34ec4a0d-dc80-4f5e-a936-4fc1b651cb50"
+    },
+    {
+      "binding": "RESOURCE_DB",
+      "database_name": "truselv-website-resources",
+      "database_id": "b35deb3f-82bc-4d30-ab73-447a566463e5"
+    }
+  ],
+  "vars": {
+    "ACCESS_HEADER": "Cf-Access-Authenticated-User-Email",
+    "CF_ACCOUNT_ID": "c545ce263e3eb6415163467980eca2d5",
+    "PORTAL_HOST": "portal.truselv.co.uk"
+  },
+  "r2_buckets": [
+    {
+      "binding": "RESOURCE_FILES",
+      "bucket_name": "truselv-website-resources"
+    }
+  ]
 }

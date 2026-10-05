@@ -1,12 +1,14 @@
 import config from './site.config.json' with { type: 'json' };
 import { createApi, publicConfig } from './api.mjs';
 import {GATED_RESOURCES, hasResourceAccess} from './resource-access.mjs';
+import {publicResources} from './website-content/content.mjs';
 
 // Static files are served by Cloudflare Assets; only these dynamic paths invoke JS.
 const handlers = new WeakMap();
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/api/resources' || url.pathname.startsWith('/api/resources/')) return publicResources(request, env);
     const resourceName = url.pathname.startsWith('/downloads/') ? url.pathname.slice('/downloads/'.length) : '';
     if (GATED_RESOURCES.has(resourceName) && ['GET', 'HEAD'].includes(request.method) && !await hasResourceAccess(request, env.RESOURCE_ACCESS_SECRET)) {
       const location = new URL('/resources', url.origin);

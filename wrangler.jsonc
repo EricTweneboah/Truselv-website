@@ -10,16 +10,40 @@
     "binding": "ASSETS",
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*", "/downloads/*", "/js/site-config.js"]
+    "run_worker_first": [
+      "/api/*",
+      "/downloads/*",
+      "/js/site-config.js"
+    ]
   },
-  "ratelimits": [{
-    "name": "API_RATE_LIMITER",
-    "namespace_id": "1001",
-    "simple": { "limit": 12, "period": 60 }
-  }],
+  "ratelimits": [
+    {
+      "name": "API_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 12,
+        "period": 60
+      }
+    }
+  ],
   "vars": {
     "CHECKOUT_ENABLED": "true",
     "INQUIRY_FROM": "TruSelv website <website@truselv.co.uk>"
   },
-  "observability": { "enabled": false }
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "RESOURCE_DB",
+      "database_name": "truselv-website-resources",
+      "database_id": "b35deb3f-82bc-4d30-ab73-447a566463e5"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "RESOURCE_FILES",
+      "bucket_name": "truselv-website-resources"
+    }
+  ]
 }
