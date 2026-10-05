@@ -46,6 +46,35 @@ npx wrangler deploy
 
 Every new device must be assigned to a ward. Existing unassigned devices should be retired or re-registered after creating the appropriate wards.
 
+## Upgrade: TESS Standard and TESS Organisation
+
+Apply all earlier migrations, then apply the organisation-platform migration
+before deploying the Worker:
+
+```powershell
+npx wrangler d1 execute tess-facility-portal --remote --file=migrations/007_tess_organisation_platform.sql
+npx wrangler deploy
+```
+
+Migration 007 is additive. It converts aggregate licence counts into numbered
+tablet seats, preserves existing device/licence links, and adds versioned
+organisation configuration, customer-owned device support, dedicated resident
+assignments, device commands and encrypted resident profile forms.
+
+The operating model is:
+
+- **TESS Standard** is the maintained personal/family experience.
+- **TESS Organisation** adds an isolated organisation tenant, roles, wards or
+  units, resident sessions, evidence, configurable branding/features and
+  centrally managed tablets.
+- A tablet seat can be used by either a TruSelv-supplied or customer-owned
+  compatible tablet.
+- Shared tablets select a ward and start individual, group or anonymous
+  sessions.
+- Dedicated tablets pair to one resident. Ending the assignment locks the
+  tablet in `privacy_reset_pending`; it cannot be assigned again until the app
+  securely deletes resident-local data and acknowledges the reset command.
+
 ## Data model and boundaries
 
 - `facility_users.facility_id` is the tenant boundary. Every facility query is scoped to the signed-in user’s facility; `ward_id` limits ward accounts to one ward.
@@ -70,11 +99,16 @@ Every new device must be assigned to a ward. Existing unassigned devices should 
 
 The app uses a registered device key with `Authorization: Bearer <device-key>`:
 
-- `GET /api/device/bootstrap` returns the facility ID, device status and active licence.
+- `GET /api/device/bootstrap` returns the tenant configuration, device mode,
+  resident assignment and pending commands as well as licence status.
 - `GET /api/device/context` returns the device ward's active residents and current activity session.
 - `POST /api/device/sessions/start` starts a validated individual, group, or anonymous session.
 - `POST /api/device/sessions/end` ends the active session.
 - `POST /api/device/events` accepts a bounded batch of privacy-minimised activity events.
+- `GET|POST /api/device/profile-forms` loads and saves encrypted profile forms
+  only for the resident in the current individual or dedicated session.
+- `POST /api/device/commands/ack` confirms that a tablet completed a safe
+  command such as the mandatory reassignment privacy reset.
 
 The dedicated analytics page uses the self-hosted Apache ECharts build and structured session observations. See `ANALYTICS_CQC.md` for evidence boundaries, CQC mapping, and scaling guidance.
 
