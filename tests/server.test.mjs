@@ -4,10 +4,13 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { createHandler, validateInquiry, checkoutReady } from '../server.mjs';
 import {validWorkEmail, validateResourceLead} from '../resource-access.mjs';
+import {createPurchaseToken} from '../purchase-access.mjs';
 
 const base = JSON.parse(await readFile(new URL('../site.config.json', import.meta.url), 'utf8'));
 const ready = { ...base, salesReady: true, legalName: 'Test seller', companyNumber: '12345678', registeredOffice: 'Test address' };
-const enabledEnv = { SITE_URL: 'https://truselv.example', CHECKOUT_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_fake', STRIPE_PRICE_ID: 'price_test', STRIPE_PUBLISHABLE_KEY: 'pk_test_fake' };
+const purchaseSecret = 'test-purchase-secret-that-is-at-least-32-characters';
+const purchaseToken = await createPurchaseToken(purchaseSecret, {email:'buyer@example.com', maxQuantity:50, expiresAt:new Date(Date.now()+86400000).toISOString()});
+const enabledEnv = { SITE_URL: 'https://truselv.example', CHECKOUT_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_fake', STRIPE_PRICE_ID: 'price_test', STRIPE_PUBLISHABLE_KEY: 'pk_test_fake', PURCHASE_LINK_SECRET: purchaseSecret };
 async function fixture(t, config = base, env = {}, fetcher = () => { throw new Error('Unexpected external request'); }) {
   const server = http.createServer(createHandler({ config, env: { SITE_URL: 'https://truselv.example', ...env }, fetcher }));
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -26,6 +29,14 @@ test('static files and byte-range video work; source secrets stay private', asyn
   assert.equal(range.status, 206); assert.equal((await range.arrayBuffer()).byteLength, 100);
   assert.equal((await api.get('/assets/welcome.mp4', { headers: { Range: 'bytes=9999999999-' } })).status, 416);
   const config = await (await api.get('/js/site-config.js')).text(); assert.match(config, /"checkoutEndpoint":""/); assert.doesNotMatch(config, /sk_test/);
+});
+test('local server hides private shop routes without an invitation', async t => {
+  const api = await fixture(t);
+  for (const path of ['/shop','/shop/','/shop.html']) {
+    const response = await api.get(path,{redirect:'manual'});
+    assert.equal(response.status,302);
+    assert.equal(response.headers.get('location'),'/book-demo?purchase=demo-first');
+  }
 });
 test('checkout stays disabled without explicit complete configuration', async t => {
   assert.equal(checkoutReady(base, enabledEnv), true);
@@ -89,7 +100,7 @@ test('embedded checkout uses verified server price and configured parameters, ig
     calls.push([url,options]);
     return new Response(JSON.stringify(url.includes('/prices/') ? { active: true, type: 'one_time', currency: 'gbp', unit_amount: 11900, tax_behavior: 'unspecified' } : { client_secret: 'cs_test_secret', id: 'cs_test_12345678901' }), { status: 200 });
   });
-  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}, amount: 1, shippingAmount: 1, price: 'cheap', success_url: 'https://bad.example' });
+  const response = await api.post('/api/checkout', { quantity: 2, email: 'buyer@example.com', purchaseToken, termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}, amount: 1, shippingAmount: 1, price: 'cheap', success_url: 'https://bad.example' });
   assert.equal(response.status, 200);
   const fields = new URLSearchParams(calls[1][1].body);
   assert.equal(fields.get('line_items[0][quantity]'), '2'); assert.equal(fields.get('line_items[0][price]'), 'price_test');
@@ -101,9 +112,18 @@ test('embedded checkout uses verified server price and configured parameters, ig
   assert.equal(fields.get('shipping_options[1][shipping_rate_data][display_name]'), 'Next working day (order before 6pm UK time)');
   assert.equal(fields.get('mode'), 'payment'); assert.equal(fields.get('ui_mode'), 'form'); assert.equal(fields.has('success_url'), false); assert.equal(fields.get('billing_address_collection'), 'auto'); assert.equal(fields.get('automatic_tax[enabled]'), 'false'); assert.match(calls[1][1].headers['Stripe-Version'], /custom_checkout_payment_form_preview=v1/); assert.deepEqual(await response.json(), {client_secret:'cs_test_secret',session_id:'cs_test_12345678901'});
 });
+test('checkout rejects absent, altered, wrong-email and over-limit purchase invitations', async t => {
+  const api = await fixture(t, ready, enabledEnv);
+  const order = {quantity:2,email:'buyer@example.com',termsAccepted:true,shippingAddress:{line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'}};
+  assert.equal((await api.post('/api/checkout', order)).status, 403);
+  assert.equal((await api.post('/api/checkout', {...order,purchaseToken:`${purchaseToken}changed`})).status, 403);
+  assert.equal((await api.post('/api/checkout', {...order,email:'someone@example.com',purchaseToken})).status, 403);
+  const oneTablet = await createPurchaseToken(purchaseSecret, {email:'buyer@example.com',maxQuantity:1,expiresAt:new Date(Date.now()+86400000).toISOString()});
+  assert.equal((await api.post('/api/checkout', {...order,purchaseToken:oneTablet})).status, 403);
+});
 test('a changed price or recurring price cannot be charged', async t => {
   const api = await fixture(t, ready, enabledEnv, async () => new Response(JSON.stringify({ active: true, type: 'recurring', currency: 'gbp', unit_amount: 11900, tax_behavior: 'unspecified' })));
-  assert.equal((await api.post('/api/checkout', { quantity: 1, email: 'buyer@example.com', termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'} })).status, 503);
+  assert.equal((await api.post('/api/checkout', { quantity: 1, email: 'buyer@example.com', purchaseToken, termsAccepted: true, shippingAddress: {line1:'1 Test Road',city:'London',postal_code:'SW1A 1AA',country:'GB'} })).status, 503);
 });
 test('order status only reports confirmed TESS payments and returns no personal data', async t => {
   let paid = false;

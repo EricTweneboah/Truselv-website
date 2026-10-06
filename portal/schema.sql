@@ -100,6 +100,18 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 CREATE INDEX IF NOT EXISTS audit_log_facility_date ON audit_log(facility_id, created_at);
 
+CREATE TABLE IF NOT EXISTS purchase_invitations (
+  id TEXT PRIMARY KEY,
+  customer_email TEXT NOT NULL,
+  customer_name TEXT,
+  max_quantity INTEGER NOT NULL CHECK(max_quantity BETWEEN 1 AND 50),
+  expires_at TEXT NOT NULL,
+  sent_by TEXT NOT NULL,
+  sent_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS purchase_invitations_sent_at ON purchase_invitations(sent_at DESC);
+CREATE INDEX IF NOT EXISTS purchase_invitations_customer_email ON purchase_invitations(customer_email);
+
 CREATE TABLE IF NOT EXISTS portal_login_challenges (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES facility_users(id) ON DELETE CASCADE,

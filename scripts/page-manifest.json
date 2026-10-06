@@ -9,7 +9,7 @@
   },
   "tess.html": {
     "title": "TESS \u2014 more moments that matter",
-    "description": "Explore the TESS tablet: communication, games, reminiscence, radio and entertainment. \u00a3119."
+    "description": "Explore TESS communication, games, reminiscence, radio and entertainment, then book a demonstration for your setting."
   },
   "book-demo.html": {
     "title": "Book a free product demo",
@@ -38,10 +38,6 @@
   "roi-calculator.html": {
     "title": "Bedbord time & ROI calculator",
     "description": "Estimate potential staff time released and model Bedbord costs using your own assumptions, with transparent formulas and printable results."
-  },
-  "shop.html": {
-    "title": "Shop the TESS tablet",
-    "description": "Explore the \u00a3119 TESS tablet, choose your quantity and review your order enquiry."
   },
   "support.html": {
     "title": "FAQs & product support",

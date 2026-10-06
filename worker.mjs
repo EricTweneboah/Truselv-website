@@ -2,12 +2,27 @@ import config from './site.config.json' with { type: 'json' };
 import { createApi, publicConfig } from './api.mjs';
 import {GATED_RESOURCES, hasResourceAccess} from './resource-access.mjs';
 import {publicResources} from './website-content/content.mjs';
+import {validatePurchaseToken} from './purchase-access.mjs';
 
 // Static files are served by Cloudflare Assets; only these dynamic paths invoke JS.
 const handlers = new WeakMap();
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (['/shop', '/shop/', '/shop.html'].includes(url.pathname)) {
+      const invitation = await validatePurchaseToken(env.PURCHASE_LINK_SECRET, url.searchParams.get('invite'));
+      if (!invitation) {
+        const location = new URL('/book-demo', url.origin);
+        location.searchParams.set('purchase', 'demo-first');
+        return Response.redirect(location, 302);
+      }
+      const response = await env.ASSETS.fetch(request);
+      const headers = new Headers(response.headers);
+      headers.set('Cache-Control', 'private, no-store');
+      headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+      headers.set('Referrer-Policy', 'no-referrer');
+      return new Response(response.body, {status: response.status, statusText: response.statusText, headers});
+    }
     if (url.pathname === '/api/resources' || url.pathname.startsWith('/api/resources/')) return publicResources(request, env);
     const resourceName = url.pathname.startsWith('/downloads/') ? url.pathname.slice('/downloads/'.length) : '';
     if (GATED_RESOURCES.has(resourceName) && ['GET', 'HEAD'].includes(request.method) && !await hasResourceAccess(request, env.RESOURCE_ACCESS_SECRET)) {

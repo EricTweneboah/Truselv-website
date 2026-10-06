@@ -6,7 +6,7 @@ import config from '../site.config.json' with {type:'json'};
 // Malicious inputs must be rejected before a payment or email provider is called.
 function fixture() {
   let calls=0;
-  const env={SITE_URL:'https://truselv.example',CHECKOUT_ENABLED:'true',STRIPE_SECRET_KEY:'sk_test_fake',STRIPE_PUBLISHABLE_KEY:'pk_test_fake',STRIPE_PRICE_ID:'price_fake',RESEND_API_KEY:'fake',INQUIRY_FROM:'website@example.com'};
+  const env={SITE_URL:'https://truselv.example',CHECKOUT_ENABLED:'true',STRIPE_SECRET_KEY:'sk_test_fake',STRIPE_PUBLISHABLE_KEY:'pk_test_fake',STRIPE_PRICE_ID:'price_fake',RESEND_API_KEY:'fake',INQUIRY_FROM:'website@example.com',PURCHASE_LINK_SECRET:'test-purchase-secret-that-is-at-least-32-characters'};
   const api=createApi({config,env,fetcher:()=>{calls++;throw new Error('Unexpected provider call');}});
   const request=(body,contentType='application/json',origin=env.SITE_URL)=>new Request(env.SITE_URL+'/api/checkout',{method:'POST',headers:{Origin:origin,'Content-Type':contentType},body});
   return {api,request,calls:()=>calls};

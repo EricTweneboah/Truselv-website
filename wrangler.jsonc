@@ -13,7 +13,10 @@
     "run_worker_first": [
       "/api/*",
       "/downloads/*",
-      "/js/site-config.js"
+      "/js/site-config.js",
+      "/shop",
+      "/shop/",
+      "/shop.html"
     ]
   },
   "ratelimits": [

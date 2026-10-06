@@ -1,5 +1,6 @@
 import {orderWebhook} from './order-emails.mjs';
 import {createResourceAccessToken, hasResourceAccess, validateResourceLead} from './resource-access.mjs';
+import {validatePurchaseToken} from './purchase-access.mjs';
 export const SHIPPING_COUNTRIES = ['GB'];
 const STRIPE_VERSION = '2026-08-26.dahlia; custom_checkout_payment_form_preview=v1';
 export function validateInquiry(data) {
@@ -40,14 +41,14 @@ async function bodyJSON(request) {
   catch { throw Object.assign(new Error('Invalid JSON.'), {status:400}); }
 }
 export function publicConfig(config, env) {
-  const enabled = checkoutReady(config, env);
-  return {...config, inquiryEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM ? '/api/inquiries' : '', resourceAccessEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM && env.RESOURCE_ACCESS_SECRET ? '/api/resource-access' : '', checkoutEndpoint: enabled ? '/api/checkout' : '', orderStatusEndpoint: enabled ? '/api/order-status' : '', stripePublishableKey: enabled ? env.STRIPE_PUBLISHABLE_KEY : '', checkoutTestMode: enabled && env.STRIPE_SECRET_KEY.startsWith('sk_test_'), shippingCountries: SHIPPING_COUNTRIES};
+  const enabled = checkoutReady(config, env) && Boolean(env.PURCHASE_LINK_SECRET);
+  return {email:config.email, inquiryEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM ? '/api/inquiries' : '', resourceAccessEndpoint: env.RESEND_API_KEY && env.INQUIRY_FROM && env.RESOURCE_ACCESS_SECRET ? '/api/resource-access' : '', checkoutEndpoint: enabled ? '/api/checkout' : '', orderStatusEndpoint: enabled ? '/api/order-status' : '', stripePublishableKey: enabled ? env.STRIPE_PUBLISHABLE_KEY : '', checkoutTestMode: enabled && env.STRIPE_SECRET_KEY.startsWith('sk_test_'), shippingCountries: SHIPPING_COUNTRIES};
 }
 export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
   const limits = new Map();
   const siteUrl = new URL(env.SITE_URL || config.siteUrl).origin;
   const inquiriesEnabled = Boolean(env.RESEND_API_KEY && env.INQUIRY_FROM);
-  const paymentsEnabled = checkoutReady(config, env);
+  const paymentsEnabled = checkoutReady(config, env) && Boolean(env.PURCHASE_LINK_SECRET);
   function json(status, data, headers = {}) { return Response.json(data, {status, headers:{'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff', 'Referrer-Policy':'no-referrer', ...headers}}); }
   async function stripe(path, options = {}) {
     const response = await fetcher('https://api.stripe.com/v1/' + path, {...options, headers:{Authorization:`Bearer ${env.STRIPE_SECRET_KEY}`, 'Stripe-Version':STRIPE_VERSION, ...(options.headers || {})}, signal:AbortSignal.timeout(15000)});
@@ -134,6 +135,8 @@ export function createApi({config, env, fetcher = fetch, rateLimit} = {}) {
           if (!Number.isInteger(data.quantity) || data.quantity < 1 || data.quantity > 50 || !validEmail(data.email) || data.termsAccepted !== true) return json(422, { error: 'Review your quantity, email and terms.' });
           const address = data.shippingAddress;
           if (!address || !['line1', 'city', 'postal_code'].every(k => typeof address[k] === 'string' && address[k].trim().length > 0 && address[k].length <= 200) || !SHIPPING_COUNTRIES.includes(address.country)) return json(422, { error: 'Enter your full delivery address, town or city, postcode and country.' });
+          const invitation = await validatePurchaseToken(env.PURCHASE_LINK_SECRET, data.purchaseToken);
+          if (!invitation || data.email.trim().toLowerCase() !== invitation.email || data.quantity > invitation.maxQuantity) return json(403, { error: 'This private purchase link is invalid, expired or does not match the invited email address.' });
           // Never accept client-supplied amounts, Price IDs, shipping or redirect URLs.
           const price = await stripe(`prices/${encodeURIComponent(env.STRIPE_PRICE_ID)}`);
           if (!price.active || price.type !== 'one_time' || price.currency !== 'gbp' || price.unit_amount !== config.tessUnitPrice * 100) return json(503, { error: 'The product price needs review. Please contact TruSelv.' });

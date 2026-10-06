@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import { createApi, publicConfig as getPublicConfig } from './api.mjs';
 import {GATED_RESOURCES, hasResourceAccess} from './resource-access.mjs';
+import {validatePurchaseToken} from './purchase-access.mjs';
 export { validateInquiry, validEmail, checkoutReady, SHIPPING_COUNTRIES } from './api.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -40,6 +41,10 @@ export function createHandler({ config, env = process.env, fetcher = fetch, root
       }
       let pathname;
       try { pathname = decodeURIComponent(url.pathname); } catch { return json(res, 400, { error: 'Invalid URL.' }); }
+      if (['/shop', '/shop/', '/shop.html'].includes(pathname) && !await validatePurchaseToken(env.PURCHASE_LINK_SECRET, url.searchParams.get('invite'))) {
+        res.writeHead(302, {Location:'/book-demo?purchase=demo-first', 'Cache-Control':'no-store'});
+        return res.end();
+      }
       const resourceName = pathname.startsWith('/downloads/') ? pathname.slice('/downloads/'.length) : '';
       if (GATED_RESOURCES.has(resourceName)) {
         const accessRequest = new Request(url, {headers:req.headers});

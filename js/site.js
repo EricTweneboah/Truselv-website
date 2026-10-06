@@ -273,12 +273,13 @@
 
   const quantity = $('#quantity');
   if (quantity) {
+    const unitPrice = Number(quantity.dataset.unitPrice);
     let orderQuantity = 1;
     const updateQuantity = () => {
       const n = Number(quantity.value);
       const valid = quantity.value !== '' && Number.isInteger(n) && n >= 1 && n <= 50;
       $('#quantity-error').hidden = valid;
-      $('#shop-subtotal').textContent = valid ? money(n * config.tessUnitPrice) : '—';
+      $('#shop-subtotal').textContent = valid ? money(n * unitPrice) : '—';
       return valid;
     };
     quantity.addEventListener('input', updateQuantity);
@@ -292,7 +293,7 @@
       if (!updateQuantity()) { quantity.focus(); return; }
       orderQuantity = Number(quantity.value);
       $('#review-quantity').textContent = orderQuantity;
-      $('#review-price').textContent = $('#review-subtotal').textContent = money(orderQuantity * config.tessUnitPrice);
+      $('#review-price').textContent = $('#review-subtotal').textContent = money(orderQuantity * unitPrice);
       showStep(2);
     });
     $$('[data-shop-back]').forEach(el => el.addEventListener('click', () => { showStep(1); $('#review-order').focus(); }));
@@ -326,13 +327,13 @@
       const data = Object.fromEntries(new FormData(form));
       const error = $('.error-message', form), submit = $('#checkout-button');
       error.hidden = true;
-      const body = `TESS tablet order enquiry\n\nName: ${data['order-name']}\nEmail: ${data['order-email']}\nOrganisation: ${data['order-organisation'] || 'Individual'}\nDelivery address: ${[data['order-line1'], data['order-line2'], data['order-city'], data['order-state'], data['order-postcode'], data['order-country']].filter(Boolean).join(', ')}\nQuantity: ${orderQuantity}\nProduct subtotal: ${money(orderQuantity * config.tessUnitPrice)}\nOffer: One tablet per tablet.\n\nPlease confirm availability, final hardware/accessories, VAT, delivery cost and timing, setup and support details, legal seller and the full payable price before purchase.\n\nThis is an enquiry, not a confirmed purchase.`;
+      const body = `TESS tablet order enquiry\n\nName: ${data['order-name']}\nEmail: ${data['order-email']}\nOrganisation: ${data['order-organisation'] || 'Individual'}\nDelivery address: ${[data['order-line1'], data['order-line2'], data['order-city'], data['order-state'], data['order-postcode'], data['order-country']].filter(Boolean).join(', ')}\nQuantity: ${orderQuantity}\nProduct subtotal: ${money(orderQuantity * unitPrice)}\nOffer: One tablet per tablet.\n\nPlease confirm availability, final hardware/accessories, VAT, delivery cost and timing, setup and support details, legal seller and the full payable price before purchase.\n\nThis is an enquiry, not a confirmed purchase.`;
       if (!checkoutEnabled && !config.inquiryEndpoint) { showStep(3); emailReview($('#order-result'), 'TESS tablet order enquiry', body); return; }
       submit.disabled = true;
       try {
         if (checkoutEnabled) {
           await loadStripe();
-          const response = await fetch(config.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity: orderQuantity, email: data['order-email'], termsAccepted: true, shippingAddress: { line1: data['order-line1'], city: data['order-city'], postal_code: data['order-postcode'], country: data['order-country'] } }), signal: AbortSignal.timeout(15000) });
+          const response = await fetch(config.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity: orderQuantity, email: data['order-email'], purchaseToken: new URLSearchParams(location.search).get('invite'), termsAccepted: true, shippingAddress: { line1: data['order-line1'], city: data['order-city'], postal_code: data['order-postcode'], country: data['order-country'] } }), signal: AbortSignal.timeout(15000) });
           const result = await response.json();
           if (!response.ok || !result.client_secret || !result.session_id) throw new Error(result.error || 'Checkout could not be opened. Please contact us.');
           if (embeddedCheckout) embeddedCheckout.destroy();
