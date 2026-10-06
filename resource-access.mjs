@@ -1,6 +1,7 @@
 export const GATED_RESOURCES = new Set([
   'bedbord-product-brief.pdf',
   'tess-product-brief.pdf',
+  'tess-standard-and-organisation-guide.pdf',
   'pilot-planning-guide.pdf',
   'procurement-checklist.pdf',
   'truselv-company-overview.pdf'
