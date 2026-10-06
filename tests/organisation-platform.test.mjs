@@ -66,4 +66,17 @@ test('device and staff control planes are host-isolated', () => {
   assert.match(worker, /hostname!==\(env\.ADMIN_HOST/);
   assert.match(worker, /hostname===deviceHost&&!isDeviceRoute/);
   assert.match(worker, /hostname!==deviceHost&&isDeviceRoute/);
+  assert.match(worker, /url\.hostname===deviceHost&&!url\.pathname\.startsWith\(['"]\/api\/device\//);
+  assert.match(worker, /url\.pathname\.startsWith\(['"]\/api\/admin\/['"]\)&&url\.hostname!==adminHost/);
+});
+
+test('portal sessions refresh both server expiry and browser cookie', () => {
+  assert.match(worker, /async function refreshLogin/);
+  assert.match(worker, /Set-Cookie['"]?:sessionCookie\(token\)/);
+  assert.match(worker, /\/api\/auth\/refresh/);
+});
+
+test('support summary is calculated across the complete scoped directory', () => {
+  assert.match(worker, /SELECT status,COUNT\(\*\) count FROM support_tickets/);
+  assert.match(worker, /return json\(\{tickets,messages,summary,categories/);
 });
