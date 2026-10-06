@@ -6,6 +6,10 @@ const migration = await readFile(
   new URL('../portal/migrations/007_tess_organisation_platform.sql', import.meta.url),
   'utf8',
 );
+const productTierMigration = await readFile(
+  new URL('../portal/migrations/008_product_tiers.sql', import.meta.url),
+  'utf8',
+);
 const worker = await readFile(
   new URL('../portal/worker.mjs', import.meta.url),
   'utf8',
@@ -28,6 +32,14 @@ test('organisation migration establishes configuration, seats and assignments', 
   assert.match(migration, /device_assignments_one_active/);
   assert.match(migration, /row_number\(\) OVER \(PARTITION BY licence_id/);
   assert.match(migration, /data_cipher TEXT NOT NULL/);
+});
+
+test('commercial model exposes only Standard and Organisation tiers', () => {
+  assert.match(productTierMigration, /SET plan='organisation' WHERE plan='dedicated'/);
+  assert.match(worker, /const normalisedPlan=value=>value==='standard'\?'standard':'organisation'/);
+  assert.match(worker, /Organisation setup is available with TESS Organisation/);
+  assert.match(worker, /Resident-assigned tablets require TESS Organisation/);
+  assert.doesNotMatch(worker, /\['standard','organisation','dedicated'\]\.includes/);
 });
 
 test('device lifecycle enforces tenant, licence-date and privacy boundaries', () => {
