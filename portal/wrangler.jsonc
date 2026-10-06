@@ -44,7 +44,9 @@
   "vars": {
     "ACCESS_HEADER": "Cf-Access-Authenticated-User-Email",
     "CF_ACCOUNT_ID": "c545ce263e3eb6415163467980eca2d5",
-    "PORTAL_HOST": "portal.truselv.co.uk"
+    "PORTAL_HOST": "portal.truselv.co.uk",
+    "ADMIN_HOST": "admin.truselv.co.uk",
+    "DEVICE_HOST": "device-api.truselv.co.uk"
   },
   "r2_buckets": [
     {

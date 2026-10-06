@@ -39,3 +39,31 @@ test('device lifecycle enforces tenant, licence-date and privacy boundaries', ()
   );
   assert.match(worker, /assigned_resident_id IS NULL/);
 });
+
+test('staff directories paginate on the server and expose audit history', () => {
+  assert.match(worker, /function pageRequest\(url\)/);
+  assert.match(worker, /function pageResponse\(items,total/);
+  for (const route of [
+    '/api/admin/portfolio',
+    '/api/facilities',
+    '/api/support/tickets',
+    '/api/wards',
+    '/api/devices',
+    '/api/licences',
+    '/api/residents',
+    '/api/users',
+    '/api/audit',
+  ]) {
+    const routePattern = route.replaceAll('/', '\\/');
+    assert.match(worker, new RegExp(`${routePattern}.*request\\.method===['"]GET['"]`));
+  }
+  assert.match(worker, /LIMIT \? OFFSET \?/);
+  assert.match(worker, /FROM audit_log a/);
+});
+
+test('device and staff control planes are host-isolated', () => {
+  assert.match(worker, /Cf-Access-Jwt-Assertion/);
+  assert.match(worker, /hostname!==\(env\.ADMIN_HOST/);
+  assert.match(worker, /hostname===deviceHost&&!isDeviceRoute/);
+  assert.match(worker, /hostname!==deviceHost&&isDeviceRoute/);
+});
