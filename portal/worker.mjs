@@ -174,7 +174,7 @@ async function api(request,env,url){
  if(url.pathname==='/api/support/tickets/reply'&&request.method==='POST'){const v=await input(request),ticketId=text(v.ticketId,64),message=text(v.message,3000);if(!ticketId||!message)return fail('Enter a reply.');const ticket=await env.DB.prepare('SELECT t.*,f.name facility_name FROM support_tickets t JOIN facilities f ON f.id=t.facility_id WHERE t.id=?').bind(ticketId).first();if(!ticket||(user.role!=='truselv_admin'&&ticket.facility_id!==user.facility_id))return fail('Ticket not found.',404);const visible=user.role==='truselv_admin'?v.visibleToFacility!==false:true,nextStatus=user.role==='truselv_admin'?(visible?'waiting':ticket.status):'open';await env.DB.batch([env.DB.prepare('INSERT INTO support_ticket_messages (id,ticket_id,author_email,author_role,message,visible_to_facility) VALUES (?,?,?,?,?,?)').bind(id(),ticketId,user.email,user.role,message,visible?1:0),env.DB.prepare('UPDATE support_tickets SET status=?,updated_at=? WHERE id=?').bind(nextStatus,now(),ticketId)]);await audit(env,user,'support.ticket.replied','support_ticket',ticketId,{visibleToFacility:visible});if(visible){const recipient=user.role==='truselv_admin'?ticket.requester_email:(env.SUPPORT_INBOX||'support@truselv.co.uk');await sendMail(env,{to:recipient,subject:`[${ticket.reference}] New support reply`,idempotencyKey:`tess-support-reply/${ticketId}/${id()}`,text:`New reply for ${ticket.reference}\nFacility: ${ticket.facility_name}\nFrom: ${user.email}\n\n${message}\n\nView the request at ${user.role==='truselv_admin'?`https://${env.PORTAL_HOST}`:'https://admin.truselv.co.uk'}`});}return json({id:ticketId,status:nextStatus});}
  const facilityId=scope(user,url.searchParams.get('facilityId'));
  if(url.pathname==='/api/configuration'&&request.method==='GET'){permitted(user,r=>manage(r)||facilityStructure(r));if(!facilityId)return fail('Choose a facility.',400);const facility=await env.DB.prepare('SELECT id,name,plan,terminology_person,terminology_unit FROM facilities WHERE id=?').bind(facilityId).first(),published=await env.DB.prepare("SELECT id,version,schema_version,status,config_json,change_summary,created_by,approved_by,created_at,published_at FROM organisation_config_versions WHERE facility_id=? AND status='published' ORDER BY version DESC LIMIT 1").bind(facilityId).first(),drafts=(await env.DB.prepare("SELECT id,version,schema_version,status,config_json,change_summary,created_by,created_at FROM organisation_config_versions WHERE facility_id=? AND status='draft' ORDER BY version DESC LIMIT 20").bind(facilityId).all()).results;return json({facility,published:published?{...published,config:JSON.parse(published.config_json)}:null,drafts:drafts.map(row=>({...row,config:JSON.parse(row.config_json)})),featureIds:configurableFeatures});}
- if(url.pathname==='/api/configuration/draft'&&request.method==='POST'){permitted(user,manage);const v=await input(request),f=scope(user,v.facilityId),facility=await env.DB.prepare('SELECT id,name,plan,terminology_person,terminology_unit FROM facilities WHERE id=?').bind(f).first();if(facility&&normalisedPlan(facility.plan)!=='organisation')return fail('Organisation setup is available with TESS Organisation.',403);if(!facility)return fail('Choose a facility.',400);const config=validatedOrganisationConfig(v.config,facility),latest=await env.DB.prepare('SELECT MAX(version) version FROM organisation_config_versions WHERE facility_id=?').bind(f).first(),version=(Number(latest?.version)||0)+1,configId=id(),summary=text(v.changeSummary,500)||'Organisation configuration updated';await env.DB.prepare('INSERT INTO organisation_config_versions (id,facility_id,version,schema_version,status,config_json,change_summary,created_by) VALUES (?,?,?,?,?,?,?,?)').bind(configId,f,version,1,'draft',JSON.stringify(config),summary,user.email).run();await audit(env,user,'configuration.draft_created','organisation_config',configId,{facilityId:f,version});return json({id:configId,version,status:'draft',config},201);}
+ if(url.pathname==='/api/configuration/draft'&&request.method==='POST'){permitted(user,manage);const v=await input(request),f=scope(user,v.facilityId),facility=await env.DB.prepare('SELECT id,name,plan,terminology_person,terminology_unit FROM facilities WHERE id=?').bind(f).first();if(facility&&normalisedPlan(facility.plan)!=='organisation')return fail('Organisation setup is available with TESS Organisation.',403);if(!facility)return fail('Choose a facility.',400);const config=validatedOrganisationConfig(v.config,facility),latest=await env.DB.prepare('SELECT MAX(version) version FROM organisation_config_versions WHERE facility_id=?').bind(f).first(),version=(Number(latest?.version)||0)+1,configId=id(),summary=text(v.changeSummary,500)||'Organisation configuration updated';await env.DB.prepare('INSERT INTO organisation_config_versions (id,facility_id,version,schema_version,status,config_json,change_summary,created_by) VALUES (?,?,?,?,?,?,?,?)').bind(configId,f,version,config.schemaVersion,'draft',JSON.stringify(config),summary,user.email).run();await audit(env,user,'configuration.draft_created','organisation_config',configId,{facilityId:f,version,schemaVersion:config.schemaVersion});return json({id:configId,version,status:'draft',config},201);}
  if(url.pathname==='/api/configuration/publish'&&request.method==='POST'){permitted(user,manage);const v=await input(request),f=scope(user,v.facilityId),configId=text(v.configId,64),facility=await env.DB.prepare('SELECT plan FROM facilities WHERE id=?').bind(f).first();if(!facility||normalisedPlan(facility.plan)!=='organisation')return fail('Organisation setup is available with TESS Organisation.',403);const draft=await env.DB.prepare("SELECT id,version FROM organisation_config_versions WHERE id=? AND facility_id=? AND status='draft'").bind(configId,f).first();if(!draft)return fail('Choose an unpublished configuration.',404);const publishedAt=now();await env.DB.batch([env.DB.prepare("UPDATE organisation_config_versions SET status='superseded' WHERE facility_id=? AND status='published'").bind(f),env.DB.prepare("UPDATE organisation_config_versions SET status='published',approved_by=?,published_at=? WHERE id=? AND facility_id=? AND status='draft'").bind(user.email,publishedAt,configId,f),env.DB.prepare("INSERT INTO device_commands (id,facility_id,device_id,command,payload_json,status,created_by) SELECT lower(hex(randomblob(16))),facility_id,id,'refresh_config','{}','pending',? FROM devices WHERE facility_id=? AND status='active'").bind(user.email,f)]);await audit(env,user,'configuration.published','organisation_config',configId,{facilityId:f,version:draft.version});return json({id:configId,version:draft.version,status:'published',publishedAt});}
  if(url.pathname==='/api/wards'&&request.method==='GET'){permitted(user,r=>manage(r)||facilityStructure(r)||r==='ward_analytics');if(!facilityId)return fail('Choose a facility.',400);const own=user.role==='ward_analytics'?' AND id=?':'',baseArgs=[facilityId,...(own?[user.ward_id]:[])];if(!url.searchParams.has('pageSize')){const result=await env.DB.prepare(`SELECT id,name,active,created_at FROM wards WHERE facility_id=?${own} ORDER BY name`).bind(...baseArgs).all();return json({wards:result.results});}const page=pageRequest(url),search=page.search?' AND lower(name) LIKE ?':'',args=[...baseArgs,...(page.search?[`%${page.search}%`]:[])],[rows,count]=await Promise.all([env.DB.prepare(`SELECT id,name,active,created_at FROM wards WHERE facility_id=?${own}${search} ORDER BY lower(name),id LIMIT ? OFFSET ?`).bind(...args,page.size,page.offset).all(),env.DB.prepare(`SELECT COUNT(*) count FROM wards WHERE facility_id=?${own}${search}`).bind(...args).first()]);return json({wards:rows.results,pagination:pageResponse(rows.results,Number(count.count)||0,page)});}
  if(url.pathname==='/api/wards'&&request.method==='POST'){permitted(user,facilityStructure);const name=text((await input(request)).name,100);if(!facilityId||!name)return fail('A facility and ward name are required.');const wardId=id();await env.DB.prepare('INSERT INTO wards (id,facility_id,name) VALUES (?,?,?)').bind(wardId,facilityId,name).run();await audit(env,user,'ward.created','ward',wardId,{name});return json({id:wardId,name},201);}
@@ -208,4 +208,51 @@ async function api(request,env,url){
  if(url.pathname==='/api/invitations/resend'&&request.method==='POST'){permitted(user,manage);const v=await input(request),f=scope(user,v.facilityId),email=text(v.email,254)?.toLowerCase();if(!f||!email)return fail('Choose an authorised email.',400);const facility=await env.DB.prepare('SELECT name FROM facilities WHERE id=? AND status=\'active\'').bind(f).first(),invited=await env.DB.prepare('SELECT id,email,role FROM facility_users WHERE facility_id=? AND email=? AND active=1').bind(f,email).first();if(!facility||!invited)return fail('This email does not have active portal access.',404);if(!await sendInvitation(env,{email:invited.email,facilityName:facility.name,role:invited.role,userId:invited.id,attemptId:id()}))return fail('The invitation email could not be accepted. Check the Resend sender configuration.',502);await audit(env,user,'user.invitation_resent','user',invited.id,{email});return json({email,portalUrl:`https://${env.PORTAL_HOST}`});}
  return fail('Not found.',404);
 }
+const tileCapabilityCatalog={
+  chatroom:['textChat','voiceConversation'],
+  'conversation-starters':['conversationPrompts'],
+  communication:['yesNoPrompts','signLanguage'],
+  caregiver:['aboutMe','whatMatters','careNotes'],
+  faith:['books','audio'],
+  health:['exerciseVideos','relaxation'],
+  games:['cognitiveActivities'],
+  radio:['liveRadio'],
+  'live-tv':['liveChannels'],
+  youtube:['videoLibrary'],
+  music:['streamingMusic'],
+  books:['readingLibrary'],
+  podcasts:['podcastLibrary'],
+  moments:['familyInvitations','mediaSharing','voiceCalling','videoCalling'],
+  places:['placesLibrary'],
+  'british-sign-language':['signDictionary'],
+  browser:['approvedWebsites'],
+};
+
+function normalisedTiles(value){
+  const raw=object(value);
+  return Object.fromEntries(configurableFeatures.map(feature=>{
+    const candidate=object(raw[feature]);
+    const label=text(candidate.label,40);
+    const rawCapabilities=object(candidate.capabilities);
+    const capabilities=Object.fromEntries((tileCapabilityCatalog[feature]||[]).map(capability=>[
+      capability,rawCapabilities[capability]!==false,
+    ]));
+    return [feature,{visible:candidate.visible!==false,...(label?{label}:{}),capabilities}];
+  }));
+}
+
+const defaultOrganisationConfigV1=defaultOrganisationConfig;
+defaultOrganisationConfig=function(d){
+  const config=defaultOrganisationConfigV1(d);
+  return {...config,schemaVersion:2,tiles:normalisedTiles({})};
+};
+
+const validatedOrganisationConfigV1=validatedOrganisationConfig;
+validatedOrganisationConfig=function(value,facility){
+  const legacy=validatedOrganisationConfigV1(value,facility);
+  const tiles=normalisedTiles(value?.tiles);
+  const homeTiles=legacy.homeTiles.filter(feature=>tiles[feature]?.visible!==false);
+  return {...legacy,schemaVersion:2,homeTiles,tiles};
+};
+
 export default {async fetch(request,env){const url=new URL(request.url),deviceHost=env.DEVICE_HOST||'device-api.truselv.co.uk';if(url.hostname===deviceHost&&!url.pathname.startsWith('/api/device/'))return fail('Not found.',404);if(url.pathname.startsWith('/api/')){try{if(!['GET','POST'].includes(request.method))return fail('Method not allowed.',405);if(request.method==='POST'&&!url.pathname.startsWith('/api/device/'))sameOrigin(request);return await api(request,env,url);}catch(e){return fail(e.message||'The request could not be completed.',e.status||500);}}return env.ASSETS.fetch(request);}};
